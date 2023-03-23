@@ -1,0 +1,8 @@
+{"MMconfig": "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMconfig/UEye.cfg", 
+"name": "IDS uEye", 
+"Exposure":5, 
+"Frame Rate":10, 
+"Trigger": "ext. falling", 
+"Gain": 100,
+"Sensor XSize": 500,
+"Sensor YSize": 500}

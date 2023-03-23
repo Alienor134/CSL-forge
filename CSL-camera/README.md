@@ -1,0 +1,114 @@
+# CSL-camera
+
+This repository explains how to control a camera with Python provided a .dll library exists to control it with Micro-Manager. 
+It uses the library [pymmcore](https://github.com/micro-manager/pymmcore).
+
+
+**Prerequisites**:
+
+- The drivers of the cameras have been installed
+- The camera is in the database of Micro-Manager (.dll provided by the manufacturer)
+- This code was tested on Windows 
+
+
+## Install the library
+
+```
+git clone XXXXXXXX
+cd CSL-camera
+python setup.py develop
+```
+
+
+## Control camera
+
+* If not done already: install micromanager  
+  * [Windows](https://micro-manager.org/Micro-Manager_Nightly_Builds)
+  * [Linux](https://micro-manager.org/Linux_installation_from_source_MM2)
+  
+Plug the camera to the computer. 
+
+Set the Hardware Config File to "(none)" and press "OK"
+
+<p align="center">
+<a> <img src="./Images/2023-01-21-23-54-46.png" width="300"></a>
+</p>
+
+Open **Tools > Options**
+Make sure "Run server on port 4827" is clicked.
+
+<p align="center">
+<a> <img src="./Images/2023-01-21-12-48-25.png" width="300"></a>
+</p>
+
+
+Open **Devices > Hardware configuration wizard** and create a new configuration. 
+
+<p align="center">
+<a> <img src="./Images/2023-01-21-23-56-21.png" width="300"></a>
+</p>
+
+In **Available devices**, click **List by type** and select your camera by **double-clicking**.  Create a folder "Config" in the Micromanager folder and save your config file inside calling it "Daheng.cfg". 
+
+In **Devices>Device Property Browser** you will find the same of the properties that you can edit later in the python code that controls the camera. 
+
+
+```cam.mmc.getProperty(cam.name, 'Frame Rate')```
+```cam.mmc.setProperty(cam.name, 'prop', val)```
+
+
+<p align="center">
+<a> <img src="./Images/2023-01-21-23-57-38.png" width="500"></a>
+</p>
+
+
+
+Create a .json file following the model **MMconfig/Daheng.json** to set the base parameters of the camera. Specify the path to Micro-Manager .cfg file created previously.
+
+Now **make sure to close Micro-Manager and have the camera connected to your computer** to test the camera.  
+
+Open the code **Camera.py** and modify manually the paths: 
+- mm_dir is where Micro-Manager program is stored
+- the parameter config_file is where the .json file is stored
+- the parameter cam_param is your local update of the parameters (framerate, gain, etc...) and should be specified as a dictionary with entries similar to the .json file.  
+
+
+You will be able to use the python code to do live stream, snapshot or video acquisition, comment the parts you are not interested in in the __main__ of **Camera.py**
+
+Launch the code by typing in the command line: 
+
+```python Camera.py```
+
+
+
+* You might encounter trouble if pymmcore version doesn't match Micro-Manager version. To check Micro-Manager version: **Help>About Micro-Manager**
+  
+<p align="center">
+<a> <img src="./Images/2023-02-06-09-43-49.png" width="300"></a>
+</p>
+
+Then check the [pymmcore Releases](https://github.com/micro-manager/pymmcore/releases) page to find the version number that matches Micro-Manager's. Copy the commit number 
+
+<p align="center">
+<a> <img src="./Images/2023-02-06-10-39-05.png" width="300"></a>
+</p>
+
+
+In the command line type: 
+
+```pip uninstall pymmcore ```
+```pip install pymmcore==X.X.X.X``` 
+
+Here it would be pymmcore==10.3.0.71.0
+
+Now test again: 
+
+```python Camera.py```
+
+
+
+**You can import the class Camera.py for modular usage of the library.**
+
+### License
+
+This project is licensed under the [GNU General Public License v3.0](https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3)
