@@ -26,27 +26,12 @@ import argparse
 
 from serial import *
 
-
-import numpy as np
-from sacred import Ingredient
-
-arduino = Ingredient('arduino')
-
-@arduino.config
-def cfg():
-    port_arduino = "COM5"
-
-
-#Source ROMI Github: https://github.com/romi/romi-rover-build-and-test
-
-@arduino.capture
 def create_link(port_arduino):
     link = Serial(port_arduino, 115200)
     time.sleep(2.0)
     return link
 
-
-@arduino.capture
+#Source ROMI Github: https://github.com/romi/romi-rover-build-and-test
 def send_command(link, s):
     """send serial command to the arduino to create or execute a function"""
     print("Command: %s" % s)
@@ -55,8 +40,7 @@ def send_command(link, s):
     print(link.write(command.encode('ascii')))
 
     return assert_reply(read_reply(link))
-
-@arduino.capture   
+    
 def read_reply(link):
     """read reply from the arduino"""
     while True:
@@ -69,7 +53,6 @@ def read_reply(link):
                 break;
     return s
 
-@arduino.capture
 def assert_reply(line):
     """assert the intergity of the reply """
     s = str(line)
@@ -86,8 +69,8 @@ def assert_reply(line):
     return return_values
 
 
+
 #Source: https://forum.arduino.cc/index.php?topic=38981.0
-@arduino.capture
 def reset_arduino(link):
     link.setDTR(False) # Drop DTR
     time.sleep(0.022)    # 22ms is what the UI does.
@@ -96,42 +79,16 @@ def reset_arduino(link):
 
 
 
-
 if __name__ == "__main__":
 
 
 ################ PARAMETERS
 
-    parser = argparse.ArgumentParser(prog = 'SwitchLEDs')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--port', default='COM5')
     args = parser.parse_args()
     
     ## ARDUINO connection
     port_arduino = args.port
-    link = Serial(port_arduino, 115200)
-    time.sleep(2.0)
+    link = create_link(port_arduino)
 
-    blue_param = {'pin': 3,
-            'offset': 500, #ms
-            'period': 5*1000, #ms
-            'duration': 2.5*1000, #ms
-            'secondary': 1,
-            'analog_value': 255,
-            }
-
-    # purple
-    purple_param = {'pin': 11,
-                'offset': 0,
-                'period': 10*1000,
-                'duration': 5*1000,
-                'secondary': 0,
-                'analog_value': 255,
-                 }
-    add_digital_pulse(link, blue_param)
-    add_digital_pulse(link, purple_param)
-
-    start_measurement(link)
-
-    time.sleep(300)
-
-    stop_measurement(link)

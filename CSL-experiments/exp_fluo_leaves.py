@@ -38,7 +38,7 @@ import tempfile
 from serial import *
 
 from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
-from CSLcamera.Camera import Camera
+from CSLcamera.CSLcamera import Camera
 
 
 from sacred.observers import MongoObserver

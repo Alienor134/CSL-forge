@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: CSLserial
+Version: 0.0.1
+Summary: Serial interface Arduino-Python
+Author: Peter Hanappe
+Author-email: peter@hanappe.com
+License: GPLv3

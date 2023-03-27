@@ -1,0 +1,120 @@
+"""
+  
+  Copyright (C) 2023 Sony Computer Science Laboratories
+  
+  Author(s) Aliénor Lahlou
+  
+  free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see
+  <http://www.gnu.org/licenses/>.
+  
+"""
+
+import time
+
+
+import threading
+import time
+import matplotlib.pyplot as plt
+import tempfile
+import ipdb
+import cv2
+
+
+import time as TIMING
+
+
+from serial import *
+
+from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from CSLcamera.CSLcamera import Camera
+
+from CSLstage.CSLstage import CSLstage
+from CSLstage.interface_motors import interface_motors
+
+
+from sacred.observers import MongoObserver
+from sacred import Experiment
+sec = 1000
+min = 60*1000
+
+@arduino_LED.config
+def update_cfg(blue_param, purple_param, trigger_param):
+    blue_param["offset"] = 0
+    blue_param["period"] = 2*min
+    blue_param["duration"] = 2*min
+    trigger_param["period"] = sec/10
+
+
+ex = Experiment('autofocus', ingredients=[arduino_LED])
+
+ex.observers.append(MongoObserver())
+
+
+@ex.config
+def cfg(arduino_LED):
+
+
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
+    cam_param = { 
+        "TriggerSource": "Software",
+        "Gain":"10",
+        }
+
+
+    x = 0
+    y = 0
+    z = 0
+    gears = [1, 100, 1]
+
+    arduino_motors = "COM6"
+
+
+@ex.automain
+def run(_run, cam_type, cam_param, arduino_LED, arduino_motors, gears):
+
+
+    
+    link_LED = create_link(arduino_LED['port_arduino'])
+    stage = CSLstage(arduino_motors, gears)
+
+    #blue LED
+    add_digital_pulse(link_LED,  arduino_LED['blue_param'])
+
+    #camera trigger
+    add_digital_pulse(link_LED,  arduino_LED['trigger_param'])
+    cam = Camera(cam_type, cam_param)
+
+    start_measurement(link_LED)
+
+    cam.camera_mode = "continuous_stream"
+
+    
+
+    motor_thread = threading.Thread(target = interface_motors, args=(stage,))
+ 
+    cam.start()
+    motor_thread.start()
+
+
+    cam.join()
+    motor_thread.join()
+    #ipdb.set_trace()
+    
+    stop_measurement(link_LED)
+
+    """
+    cv2.imshow("frame", cam.clip_im(cam.image))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    """

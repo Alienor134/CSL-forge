@@ -29,15 +29,20 @@ import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
 import json
+import threading
 
 
 
-class Camera:
+class Camera(threading.Thread):
     def __init__(self, config_file, cam_param, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
+      threading.Thread.__init__(self)
       f = open(config_file)
       config = json.load(f)
       self.name = config["name"]
+      self.video = []
+      self.timing = []
 
+      self.camera_mode = "continuous_stream" #snap_image, snap_video
 
       self.mmc = pymmcore.CMMCore()
       self.mmc.getCameraDevice()
@@ -56,6 +61,17 @@ class Camera:
       for key in cam_param:
           self.mmc.setProperty(self.name, key, cam_param[key])
 
+    def clip_im(self, im, mini = 0.1, maxi = 0.9):
+      image = np.copy(im)
+      Q1 = np.quantile(image, mini)
+      Q3 = np.quantile(image, maxi)
+
+      image[image<Q1]=Q1
+      image[image<Q3]=Q3
+      return image
+
+       
+
     def update_param(self, key, val):
         self.mmc.setProperty(self.name, key, val)
 
@@ -67,35 +83,36 @@ class Camera:
       self.mmc.startContinuousSequenceAcquisition(1)
       while True:
         if self.mmc.getRemainingImageCount() > 0:
-          frame = self.mmc.popNextImage()
-          image = np.array(Image.fromarray(np.uint8(frame)))
-          cv2.imshow('live', cv2.normalize(image, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
+          self.frame = self.mmc.popNextImage()
+          self.image = np.array(Image.fromarray(np.uint8(self.frame)))
+          cv2.imshow('live', cv2.normalize(self.image, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
           break
 
       cv2.destroyAllWindows()
       self.mmc.stopSequenceAcquisition()
-      self.mmc.reset()
+      
+    def reset(self):
+       self.mmc.reset()
 
     def snap_image(self):
         self.mmc.snapImage()
-        frame = self.mmc.getImage()
+        self.frame = self.mmc.getImage()
         #image = np.array(Image.fromarray(np.uint8(frame)))
-        return frame
 
 
     def snap_video(self, N_im): 
-      frame_list = []
-      time_list = []
+      self.video = []
+      self.timing = []
       cv2.namedWindow('live',cv2.WINDOW_AUTOSIZE)
       self.mmc.startContinuousSequenceAcquisition(1)
       i=0
       while True:
         if self.mmc.getRemainingImageCount() > 0:
           frame = self.mmc.popNextImage()
-          frame_list.append(frame)
-          time_list.append(time.time())
+          self.video.append(frame)
+          self.timing.append(time.time())
           image = np.array(Image.fromarray(np.uint8(frame)))
           cv2.imshow('live', image)
           #print(np.mean(frame))
@@ -111,7 +128,16 @@ class Camera:
       self.mmc.stopSequenceAcquisition()
       self.mmc.reset()
 
-      return np.array(frame_list), np.array(time_list)
+
+    def run(self):
+        # call the appropriate method based on a flag or some other logic
+        if self.camera_mode == 'continuous_stream':
+            self.continuous_stream()
+        elif self.camera_mode == 'snap_video':
+            self.other_function()
+        else:
+            raise ValueError("Invalid mode: {}".format(self.camera.mode))      
+
 
 if __name__== "__main__": 
     

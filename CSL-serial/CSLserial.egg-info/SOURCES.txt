@@ -1,0 +1,6 @@
+setup.py
+CSLserial.egg-info/PKG-INFO
+CSLserial.egg-info/SOURCES.txt
+CSLserial.egg-info/dependency_links.txt
+CSLserial.egg-info/requires.txt
+CSLserial.egg-info/top_level.txt
