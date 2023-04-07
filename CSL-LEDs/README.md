@@ -6,10 +6,11 @@ The codes rely on [Arduino](https://www.arduino.cc/) and [pyserial](https://gith
 
 
 **Prerequisites**:
-- The LEDs are already set-up (To build such a set-up, refer to: https://github.com/SonyCSLParis/UC2_Fluorescence_microscope)
-- The light sources can be controlled by a pulse-width modulated signal (PWM) 
+- Install RomiSerial and the Arduino software XXXX
+- The LEDs are already set-up (Note: to build an LED controller refer to this [OpenUC2 repository](https://github.com/SonyCSLParis/UC2_Fluorescence_microscope), otherwise you might already use one of these [Thorlabs controlers](https://www.thorlabs.com/navigation.cfm?guide_id=2109)
+- The light sources can be controlled by a pulse, or pulse-width modulated signal (PWM) 
 - The code was tested on Windows and Linux
-
+  
 
 ## Install the library
 
@@ -22,25 +23,50 @@ python setup.py develop
 
 
 ## Control the LEDs 
-1. Connect the LED controller to the Arduino. (Note: to build an LED controller refer to this [OpenUC2 repository](https://github.com/SonyCSLParis/UC2_Fluorescence_microscope), otherwise you might already use one of these [Thorlabs controlers](https://www.thorlabs.com/navigation.cfm?guide_id=2109). 
+1. Connect the LED controller to the Arduino. 
 
-2. If you have never used an Arduino you can start with the [tutorial](https://www.arduino.cc/en/Guide/ArduinoUno).
-
-3. In the [ArduinoControl](/ArduinoControl/) folder you will find a [zip file](/ARDUINO/RomiSerial.zip) that you can **extract** in the folder where Arduino fetches libraries (usually "Documents/Arduino/Libraries on Windows").
-
-4. Open the [.ino](/ArduinoControl/LEDControl/LEDControl.ino) file and load the code on the Arduino. The code allows to generate sequences of excitation to control the LEDs. To check that the serial interaction works open the serial connection, select the following parameters: 
+2. Open the [.ino](/ArduinoControl/LEDControl/LEDControl.ino) file.
+3. Select the Arduino board type in the "Tools/card type"
+<p align="center">
+<a> <img src="./Images/2023-04-07-18-41-01.png" width="500"></a>
+</p>
+4. Select the COM port. If the name of the board doesn't appear near any port, change the port USB until the name appears.
 
 <p align="center">
 <a> <img src="./Images/2023-01-30-10-16-46.png" width="300"></a>
 </p>
 
+5. Press the check sign. If an error related to "RomiSerial" appears, verify that you have properly followed the instructions in the CSL-Serial repository. 
+<p align="center">
+<a> <img src="./Images/2023-04-07-18-48-09.png" width="500"></a>
+</p>
 
-5. To test that you can properly interact with the Arduino, click on the loop in the upper right to open the serial monitor and type: "#?:xxxx" and ensure you get this output: 
+6. If no error appears you can click the arrow to load the code in the Arduino. 
+ 
+7. To test that you can properly interact with the Arduino, click on the magnifying glass in the upper right to open the serial monitor and type: "#?:xxxx" and ensure you get this output: 
  <p align="center">
 <a> <img src="./Images/2023-01-30-10-18-53.png" width="300"></a>
 </p>
 
-1. You can now test the python code to interact with the Arduino. Open the python code [switch_LEDs.py](/switch_LEDs.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
+
+8. Run the code, you should see the LEDs blink.
+
+
+On Windows
+
+```python CSLleds/CSLleds.py```
+
+or
+
+```python CSLleds/CSLleds.py --port COMx```
+
+
+On Linux
+
+```python3 CSLleds/CSLleds.py --port /dev/ttyACM0```
+
+
+8. Open the python code to see how it works. Open the python code [CSLleds.py](CSLleds/CSLleds.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
 The content of interest is after ``if __name__ == __main__:`` 
 - replace the COM port with the one of your set-up ([tutorial](https://www.arduino.cc/en/Guide/ArduinoUno)). 
 - input the correct ports for the LED control. The port 3 and 11 are good choices because they are PWM pins which allow to control the intensity level of the LEDs rather than only ON-OFF. 
@@ -51,21 +77,6 @@ The content of interest is after ``if __name__ == __main__:``
 </p>
 
 
-1. Run the code, you should see the LEDs blink.
-
-
-On Windows
-
-```python3 switch_LEDs.py```
-
-or
-
-```python3 switch_LEDs.py --port COMx```
-
-
-On Linux
-
-```python3 switch_LEDs.py --port /dev/ttyACM0```
 
 ### License
 

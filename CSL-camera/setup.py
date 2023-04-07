@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 install_requires = [
     'matplotlib',
     'numpy',
-    'pymmcore',
+    'pymmcore-plus',
     'opencv-python>=4.7.0',
 ]
 

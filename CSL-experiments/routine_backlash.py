@@ -36,6 +36,7 @@ import tempfile
 import tifffile as tiff
 import ipdb
 
+import skimage
 import time as TIMING
 
 
@@ -60,7 +61,7 @@ def update_cfg(blue_param, purple_param, trigger_param):
     trigger_param["period"] = 1*sec
 
 
-ex = Experiment('find_backslash', ingredients=[arduino_LED])
+ex = Experiment('backlash', ingredients=[arduino_LED])
 
 ex.observers.append(MongoObserver())
 
@@ -79,10 +80,28 @@ def cfg(arduino_LED):
 
 
     N=10
-    step=500
+    step=-10
 
     gears = [1, 100, 1]
     arduino_motors = "COM6"
+
+
+
+@ex.config
+def my_config():
+
+    name = "backlash"
+    acq_time = 14*60
+    actinic_filter = 1
+    move_plate = False
+    length_SP = 200
+    period_SP= 10*sec
+    limit_purple = 100
+    limit_blue = 30
+    trigger_color = "no_LED_trig"
+    sample_rate=1e5
+    exposure = 800
+    gain  = 100
 
 
 
@@ -121,115 +140,56 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
 
     cam = Camera(cam_type, cam_param)
 
+    add_digital_pulse(link_LED, arduino_LED['blue_param'])
+    start_measurement(link_LED)
 
-    def focus(pos, N, step, link_LED, stage):
-        min = -N/2*step
-        max = N/2*step
-        stage.handle_enable(1)
-
+    stage.handle_enable(1)
 
 
-        add_digital_pulse(link_LED, arduino_LED['blue_param'])
-
-        positions = []
-        position = pos + min 
-        start_measurement(link_LED)
-        images = []
-        TIMING.sleep(2)
-        stage.move_dz(-300)
-        TIMING.sleep(1)
-
-
-        stage.move_dz(min)
-        TIMING.sleep(5)
-        stage.move_dz(300)
-        TIMING.sleep(1)
-
-
-        while position < max:
-            print(position)
-            stage.move_dz(step)
-            position += step
-            positions.append(position)
-            TIMING.sleep(1)
-            cam.mmc.snapImage()
-            frame = cam.mmc.getImage()
-            image = np.array(Image.fromarray(np.uint8(frame)))
-            images.append(image)
-
-        stage.move_dz(-300)
-        TIMING.sleep(1)
-
-    
-        
-        while position > min:
-            print(position)
-            stage.move_dz(-step)
-            position += -step
-            positions.append(position)
-            TIMING.sleep(1)
-            cam.mmc.snapImage()
-            frame = cam.mmc.getImage()
-            image = np.array(Image.fromarray(np.uint8(frame)))
-            images.append(image)
-        
-        stop_measurement(link_LED)
-    
-        
-        #show_images(images, cols = 3)
-        #ipdb.set_trace()
-        blurs = []
-        plt.figure()
-        for i in range(len(images)):
-            blur =  cv2.Laplacian(images[i], cv2.CV_64F).var()
-            plt.scatter(positions[i], blur)
-            blurs.append(blur)
-        
-        plt.xlabel("Voltage piezo")
-        plt.ylabel("Laplacian variance")
-        #plt.show()
-
-        
-        y = np.argmax(blurs)
-        print(y)
-        print(positions)
-        print(blurs)
-
-        #position at max:
-        stage.move_dz(300)
-        TIMING.sleep(1)
-
-        stage.move_dz(positions[y]- positions[-1])
-        TIMING.sleep(5)
-
-        
-        stage.handle_enable(0)
-
-        return min//2,  max//2, positions[y], positions, blurs, images
-
-    
-    plt.figure()
-    voltage_list = []
-    blur_list = []
+    ref_metric = skimage.filters.sobel
+    z_pos_gen = []
+    z_pos = 0
     image_list = []
-    pos = 0
-    for i in range(4):
-        min, max, pos, v, b, im = focus(pos,N, step, link_LED, stage)
-        voltage_list.extend(v)
-        blur_list.extend(b)
-        image_list.extend(im)
-        step=step//2
-        #ipdb.set_trace()
-    #ipdb.set_trace()
-        
-        
+    metric_list =  []
+
+    cam.mmc.snapImage()
+    frame = cam.mmc.getImage()
+    image = np.array(Image.fromarray(np.uint8(frame)))
+    image_list.append(image)
+    im_ref = ref_metric(image)
+    metric_list.append(im_ref)
+
+    for i in range(50):
+
+        stage.move_dz(step)
+        time.sleep(1)
+        cam.mmc.snapImage()
+        frame = cam.mmc.getImage()
+        image = np.array(Image.fromarray(np.uint8(frame)))
+        image_list.append(image)
+        im_metric = ref_metric(image)
+        metric_list.append(im_metric)
+
+        diff_metric = np.mean(im_ref-im_metric)
+        plt.plot(i*step, diff_metric, 'ok' )
+        _run.log_scalar("blur", diff_metric, i*step)
+
+        z_pos += step
+        z_pos_gen.append(z_pos)
+
+    ipdb.set_trace()
+    stage.handle_enable(0)
+    stop_measurement(link_LED)
+
+
+    """
     #with open("G:/DREAM/from_github/PAMFluo/specs/focus_wide.txt", 'w') as f:
     #    f.write('%f' %voltage_list[np.argmax(blur_list)])
     
     pos = voltage_list[-1]
     best_pos = voltage_list[np.argmax(blur_list)]
     
-    ipdb.set_trace()
+    
     for i in range(len(voltage_list)):
             _run.log_scalar("blur", blur_list[i], voltage_list[i])
 
@@ -253,3 +213,4 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     #ref: https://github.com/antonio490/Autofocus
     #ref: https://sites.google.com/site/cuongvt101/research/Sharpness-measure
     
+    """

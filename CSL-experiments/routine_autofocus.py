@@ -60,7 +60,7 @@ def update_cfg(blue_param, purple_param, trigger_param):
     trigger_param["period"] = 1*sec
 
 
-ex = Experiment('autofocus', ingredients=[arduino_LED])
+ex = Experiment('find_backslash', ingredients=[arduino_LED])
 
 ex.observers.append(MongoObserver())
 
@@ -79,28 +79,10 @@ def cfg(arduino_LED):
 
 
     N=10
-    step=300
+    step=500
 
     gears = [1, 100, 1]
     arduino_motors = "COM6"
-
-
-
-@ex.config
-def my_config():
-
-    name = "autofocus_wider"
-    acq_time = 14*60
-    actinic_filter = 1
-    move_plate = False
-    length_SP = 200
-    period_SP= 10*sec
-    limit_purple = 100
-    limit_blue = 30
-    trigger_color = "no_LED_trig"
-    sample_rate=1e5
-    exposure = 800
-    gain  = 100
 
 
 
@@ -140,7 +122,7 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     cam = Camera(cam_type, cam_param)
 
 
-    def focus(N, step, link_LED, stage):
+    def focus(pos, N, step, link_LED, stage):
         min = -N/2*step
         max = N/2*step
         stage.handle_enable(1)
@@ -150,18 +132,40 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
         add_digital_pulse(link_LED, arduino_LED['blue_param'])
 
         positions = []
-        position = min 
+        position = pos + min 
         start_measurement(link_LED)
         images = []
         TIMING.sleep(2)
+        stage.move_dz(stage.backlash_neg)
+        TIMING.sleep(1)
+
 
         stage.move_dz(min)
-        TIMING.sleep(2)
+        TIMING.sleep(5)
+        stage.move_dz(stage.backlash_pos)
+        TIMING.sleep(1)
+
 
         while position < max:
             print(position)
             stage.move_dz(step)
             position += step
+            positions.append(position)
+            TIMING.sleep(1)
+            cam.mmc.snapImage()
+            frame = cam.mmc.getImage()
+            image = np.array(Image.fromarray(np.uint8(frame)))
+            images.append(image)
+
+        stage.move_dz(stage.backlash_neg)
+        TIMING.sleep(1)
+
+    
+        
+        while position > min:
+            print(position)
+            stage.move_dz(-step)
+            position += -step
             positions.append(position)
             TIMING.sleep(1)
             cam.mmc.snapImage()
@@ -192,24 +196,30 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
         print(blurs)
 
         #position at max:
-        stage.move_dz(positions[y]-positions[-1])
+        stage.move_dz(stage.backlash_pos)
+        TIMING.sleep(1)
+
+        stage.move_dz(positions[y]- positions[-1])
+        TIMING.sleep(5)
+
         
         stage.handle_enable(0)
 
-        return min//2,  max//2, positions, blurs, images
+        return min//2,  max//2, positions[y], positions, blurs, images
 
     
     plt.figure()
     voltage_list = []
     blur_list = []
     image_list = []
+    pos = 0
     for i in range(4):
-        min, max, v, b, im = focus(N, step, link_LED, stage)
+        min, max, pos, v, b, im = focus(pos,N, step, link_LED, stage)
         voltage_list.extend(v)
         blur_list.extend(b)
         image_list.extend(im)
-        step=step*2//3
-        ipdb.set_trace()
+        step=step//2
+        #ipdb.set_trace()
     #ipdb.set_trace()
         
         
@@ -219,7 +229,7 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     pos = voltage_list[-1]
     best_pos = voltage_list[np.argmax(blur_list)]
     
-    
+    ipdb.set_trace()
     for i in range(len(voltage_list)):
             _run.log_scalar("blur", blur_list[i], voltage_list[i])
 

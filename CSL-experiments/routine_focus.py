@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import tempfile
 import ipdb
 import cv2
+import imageio
 
 
 import time as TIMING
@@ -113,8 +114,8 @@ def run(_run, cam_type, cam_param, arduino_LED, arduino_motors, gears):
     
     stop_measurement(link_LED)
 
-    """
-    cv2.imshow("frame", cam.clip_im(cam.image))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    """
+    ftmp = tempfile.NamedTemporaryFile(delete=False)
+    fname = ftmp.name + ".png"
+    imageio.imwrite(fname, cam.image)
+
+    _run.add_artifact(fname, "focus_image.png")

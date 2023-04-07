@@ -21,7 +21,7 @@
   #source https://github.com/mightenyip/neuronDetection/blob/14d64c44ab4a9e11af14c15961cd5ea4d22506e2/live_neuron_detection.py
 
 """
-import pymmcore
+import pymmcore_plus
 import os.path
 import time
 import numpy as np
@@ -44,7 +44,7 @@ class Camera(threading.Thread):
 
       self.camera_mode = "continuous_stream" #snap_image, snap_video
 
-      self.mmc = pymmcore.CMMCore()
+      self.mmc = pymmcore_plus.CMMCorePlus()
       self.mmc.getCameraDevice()
       self.mmc.setDeviceAdapterSearchPaths([mm_dir])
       self.mmc.loadSystemConfiguration(config["MMconfig"])
@@ -151,6 +151,10 @@ if __name__== "__main__":
   #cam_param = {"Trigger": "internal"}
   #cam = Camera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json", cam_param)
 
+  """ ANDOR """
+  #cam_param = {}
+  #cam = Camera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Andor.json", cam_param)
+
   """ Acquisition """
 
   """ Continuous stream """
@@ -171,4 +175,5 @@ if __name__== "__main__":
   #N_im = exp_duration * float(cam.get_param("AcquisitionFrameRate"))
   N_im =  20
 
-  video, timing = cam.snap_video(N_im)
+  cam.snap_video(N_im)
+  print(len(cam.video))

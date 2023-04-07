@@ -1,8 +1,10 @@
 {"MMconfig": "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMconfig/Daheng.cfg", 
 "name": "DahengCamera", 
-"Exposure": 90000,
-"AcquisitionFrameRate": 10,
-"TriggerSource": "Software",
-"Gain": 23,
 "SensorHeight":2048,
-"SensorWidth":2448}
+"SensorWidth":2448,
+"AcquisitionFrameRate": 10,
+"Gain": 23,
+"Exposure": 100000,
+"TriggerSource": "Software"
+
+}
