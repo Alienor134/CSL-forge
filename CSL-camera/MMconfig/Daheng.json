@@ -3,8 +3,8 @@
 "SensorHeight":2048,
 "SensorWidth":2448,
 "AcquisitionFrameRate": 10,
-"Gain": 23,
-"Exposure": 100000,
+"Gain": 10,
+"Exposure": 10000,
 "TriggerSource": "Software"
 
 }
