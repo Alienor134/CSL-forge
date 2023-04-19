@@ -68,6 +68,7 @@ def cfg(arduino_LED):
 
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
     cam_param = { 
+        "TriggerMode":"Off",
         "TriggerSource": "Software",
         "Gain":"10",
         }

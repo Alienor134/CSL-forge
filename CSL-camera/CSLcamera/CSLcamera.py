@@ -30,18 +30,19 @@ import cv2
 from PIL import Image
 import json
 import threading
-
+import skimage
+import ipdb
 
 
 class Camera(threading.Thread):
-    def __init__(self, config_file, cam_param, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
+    def __init__(self, config_file, cam_param, downscale=1, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
       threading.Thread.__init__(self)
       f = open(config_file)
       config = json.load(f)
       self.name = config["name"]
       self.video = []
       self.timing = []
-
+      self.downscale = downscale
       self.camera_mode = "continuous_stream" #snap_image, snap_video
 
       self.mmc = pymmcore_plus.CMMCorePlus()
@@ -111,7 +112,8 @@ class Camera(threading.Thread):
       while True:
         if self.mmc.getRemainingImageCount() > 0:
           frame = self.mmc.popNextImage()
-          self.video.append(frame)
+          frame = np.mean(frame, axis = 2)
+          self.video.append(skimage.transform.downscale_local_mean(frame, 10))
           self.timing.append(time.time())
           image = np.array(Image.fromarray(np.uint8(frame)))
           cv2.imshow('live', image)

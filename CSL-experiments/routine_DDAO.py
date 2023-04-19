@@ -52,62 +52,56 @@ min = 60*1000
 
 @arduino_LED.config
 def update_cfg(blue_param, purple_param, trigger_param):
-
     blue_param["offset"] = 0
     blue_param["period"] = 10*min
     blue_param["duration"] = 10*min
-    blue_param["analog_value"] = 255
+    blue_param["analog_value"] = 150
+
+    purple_param["offset"] = 0
+    purple_param["period"] = 10*min
+    purple_param["duration"] = 10*min
+    purple_param["analog_value"] = 150
 
     trigger_param["period"] = 1*sec
 
 
-ex = Experiment('Dronpa2', ingredients=[arduino_LED, save_folder ])
+ex = Experiment('DDAO', ingredients=[arduino_LED, save_folder ])
 ex.observers.append(MongoObserver())
-
 
 
 @ex.config
 def cfg(arduino_LED):
-        framerate = 1000/arduino_LED['trigger_param']['period']
-        exp_duration = 60*250//arduino_LED["blue_param"]["analog_value"]
-        downscale = 10
 
-@ex.named_config
-def Daheng():
-
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
-
-    cam_param = {"Exposure": 900000,
+    framerate = 1000/arduino_LED['trigger_param']['period']
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
+    cam_param = {"TriggerMode":"Off",
+                 "TriggerSource":"Software",
+                "Exposure": 900000,
                  "Gain": 23,
-                 "SensorHeight":2048,
-                "SensorWidth":2448,
-                "TriggerMode": "On",
-                "TriggerSource":"Line2"}
+                 "SensorHeight":2048//4,
+                "SensorWidth":2448//4,}
+    
+    exp_duration = 2
 
-@ex.named_config
-def UEye():
 
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
-    cam_param = {"Exposure": 97,
-                 "Gain": 100}
 
-#@ex.capture()
-#def open_camera():
-#    cam = Camera(cam_type, cam_param, downscale)
-#    return cam
 
 @ex.automain
-def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downscale):
+def run(_run, cam_type, cam_param, exp_duration, framerate, arduino_LED):
     #ipdb.set_trace()
     save_folder =  make_folder(_run)
     ### initialize devices
     ##ARDUINO
     link = create_link(arduino_LED['port_arduino'])
 
-    cam = Camera(cam_type, cam_param, downscale)
+
+    cam = Camera(cam_type, cam_param)
 
 
     #blue LED
+    #add_digital_pulse(link,  arduino_LED['blue_param'])
+
+    #purple LED
     add_digital_pulse(link,  arduino_LED['blue_param'])
 
     #camera trigger
@@ -118,28 +112,18 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     print('It will last ', exp_duration, 'seconds.')
     start_measurement(link)
 
-    cam.snap_video(exp_duration*framerate)
+    cam.snap_image()
 
     stop_measurement(link)
-
-    result, timing = np.array(cam.video), np.array(cam.timing)
-    fname = save_folder + "/video.tiff"
-    tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
+    
+    im = np.array(cam.frame)
+    fname = save_folder + "/image.tiff"
+    tifffile.imwrite(fname, im, photometric="minisblack")
             
-    fname_t = save_folder + '/video_timing.csv'
-    pd.DataFrame(timing).to_csv(fname_t)
+    cam.reset()
 
+    _run.add_artifact(fname, "image.tiff")
 
-    #ftmp = tempfile.NamedTemporaryFile(delete=False)
-    #fname = ftmp.name + ".pkl"
-    #with open(fname,'wb') as f:
-    #    pickle.dump(result, f)
+    _run.log_scalar("Fluorescence", np.mean(im), arduino_LED['blue_param']['analog_value'])
+    
 
-    #_run.add_artifact(fname, "video.npy")
-
-    _run.add_artifact(fname, "video.tiff")
-    _run.add_artifact(fname, "video_timing.csv")
-
-    for i, frame in enumerate(result):
-        _run.log_scalar("Fluorescence", np.mean(frame), i)
-        _run.log_scalar("Time", i/framerate, i)
