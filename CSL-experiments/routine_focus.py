@@ -57,23 +57,13 @@ def update_cfg(blue_param, purple_param, trigger_param):
     trigger_param["period"] = sec/10
 
 
-ex = Experiment('autofocus', ingredients=[arduino_LED])
+ex = Experiment('routine_focus', ingredients=[arduino_LED])
 
 ex.observers.append(MongoObserver())
 
 
 @ex.config
 def cfg(arduino_LED):
-
-
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
-    cam_param = { 
-        "TriggerMode":"Off",
-        "TriggerSource": "Software",
-        "Gain":"10",
-        }
-
-
     x = 0
     y = 0
     z = 0
@@ -81,6 +71,25 @@ def cfg(arduino_LED):
 
     arduino_motors = "COM6"
 
+
+@ex.named_config
+def Daheng():
+    
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
+    cam_param = { 
+        "Exposure":900000,
+        "TriggerMode":"Off",
+        "TriggerSource": "Software",
+        "Gain":"10",
+        }
+
+@ex.named_config
+def UEye():
+
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_param = {"Exposure": 97,
+                 "Gain": 100}
+    
 
 @ex.automain
 def run(_run, cam_type, cam_param, arduino_LED, arduino_motors, gears):

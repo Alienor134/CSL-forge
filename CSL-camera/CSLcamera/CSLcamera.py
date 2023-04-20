@@ -44,6 +44,7 @@ class Camera(threading.Thread):
       self.timing = []
       self.downscale = downscale
       self.camera_mode = "continuous_stream" #snap_image, snap_video
+      self.N_im = 10
 
       self.mmc = pymmcore_plus.CMMCorePlus()
       self.mmc.getCameraDevice()
@@ -113,7 +114,7 @@ class Camera(threading.Thread):
         if self.mmc.getRemainingImageCount() > 0:
           frame = self.mmc.popNextImage()
           frame = np.mean(frame, axis = 2)
-          self.video.append(skimage.transform.downscale_local_mean(frame, 10))
+          self.video.append(skimage.transform.downscale_local_mean(frame, self.downscale))
           self.timing.append(time.time())
           image = np.array(Image.fromarray(np.uint8(frame)))
           cv2.imshow('live', image)
@@ -136,7 +137,7 @@ class Camera(threading.Thread):
         if self.camera_mode == 'continuous_stream':
             self.continuous_stream()
         elif self.camera_mode == 'snap_video':
-            self.other_function()
+            self.snap_video(self.N_im)
         else:
             raise ValueError("Invalid mode: {}".format(self.camera.mode))      
 

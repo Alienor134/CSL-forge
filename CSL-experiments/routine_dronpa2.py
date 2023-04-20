@@ -53,11 +53,13 @@ min = 60*1000
 @arduino_LED.config
 def update_cfg(blue_param, purple_param, trigger_param):
 
-    blue_param["offset"] = 0
+    blue_param["offset"] = 5*sec
     blue_param["period"] = 10*min
     blue_param["duration"] = 10*min
     blue_param["analog_value"] = 255
-
+    
+    
+    trigger_param["offset"] = 3*sec
     trigger_param["period"] = 1*sec
 
 
@@ -69,8 +71,8 @@ ex.observers.append(MongoObserver())
 @ex.config
 def cfg(arduino_LED):
         framerate = 1000/arduino_LED['trigger_param']['period']
-        exp_duration = 60*250//arduino_LED["blue_param"]["analog_value"]
-        downscale = 10
+        exp_duration = 150*250//arduino_LED["blue_param"]["analog_value"]
+        downscale = 1
 
 @ex.named_config
 def Daheng():
@@ -88,7 +90,8 @@ def Daheng():
 def UEye():
 
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
-    cam_param = {"Exposure": 97,
+    cam_param = {"Frame Rate":1,
+                "Exposure": 997,
                  "Gain": 100}
 
 #@ex.capture()
@@ -105,7 +108,8 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     link = create_link(arduino_LED['port_arduino'])
 
     cam = Camera(cam_type, cam_param, downscale)
-
+    #cam.camera_mode = "snap_video"
+    #cam.N_im = framerate*exp_duration
 
     #blue LED
     add_digital_pulse(link,  arduino_LED['blue_param'])
@@ -116,11 +120,14 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     #purple LED
     #add_primary_digital_pulse(link, purple_param)
     print('It will last ', exp_duration, 'seconds.')
+
+    #cam.start()
+    
     start_measurement(link)
 
-    cam.snap_video(exp_duration*framerate)
-
+    cam.snap_video(framerate*exp_duration)
     stop_measurement(link)
+    #cam.join()
 
     result, timing = np.array(cam.video), np.array(cam.timing)
     fname = save_folder + "/video.tiff"

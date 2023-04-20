@@ -60,7 +60,7 @@ def update_cfg(blue_param, purple_param, trigger_param):
     trigger_param["period"] = 1*sec
 
 
-ex = Experiment('find_backslash', ingredients=[arduino_LED])
+ex = Experiment('autofocus', ingredients=[arduino_LED])
 
 ex.observers.append(MongoObserver())
 
