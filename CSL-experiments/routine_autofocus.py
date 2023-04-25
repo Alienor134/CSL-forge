@@ -42,6 +42,8 @@ import time as TIMING
 from serial import *
 
 from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from ingredient_save_folder import save_folder, make_folder
+
 from CSLcamera.CSLcamera import Camera
 
 from CSLstage.CSLstage import CSLstage
@@ -58,9 +60,11 @@ def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["period"] = 2*min
     blue_param["duration"] = 1*min
     trigger_param["period"] = 1*sec
+    blue_param["analog_value"] = 255
 
 
-ex = Experiment('autofocus', ingredients=[arduino_LED])
+
+ex = Experiment('autofocus', ingredients=[arduino_LED, save_folder])
 
 ex.observers.append(MongoObserver())
 
@@ -71,15 +75,17 @@ def cfg(arduino_LED):
 
     framerate = 1000/arduino_LED['trigger_param']['period']
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
-    cam_param =  {"TriggerMode": "Off",
+    cam_param =  {
+        "Exposure":1000*900,
+        "TriggerMode": "Off",
         "TriggerSource": "Software",
-        "Gain":"4",
+        "Gain":"10",
         }
 
 
 
     N=10
-    step=500
+    step=200
 
     gears = [1, 100, 1]
     arduino_motors = "COM6"
@@ -116,6 +122,8 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
         fig.set_size_inches(np.array(fig.get_size_inches()) * n_images)
         #plt.show()
     
+    save_folder =  make_folder(_run)
+
     link_LED = create_link(arduino_LED['port_arduino'])
     stage = CSLstage(arduino_motors, gears)
 
@@ -155,6 +163,15 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
             cam.mmc.snapImage()
             frame = cam.mmc.getImage()
             image = np.array(Image.fromarray(np.uint8(frame)))
+            plt.figure()
+            plt.imshow(np.sum(image[:,:,:3], axis = 2))
+            plt.axis('off')
+            save_name = save_folder + "autofocus_%d.png"%position
+            plt.savefig(save_name, bbox_inches = 'tight')
+
+            plt.close('all')
+            _run.add_artifact(save_name, "autofocus_%d.png"%position)
+
             images.append(image)
 
         stage.move_dz(stage.backlash_neg)

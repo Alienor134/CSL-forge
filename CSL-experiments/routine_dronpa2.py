@@ -56,7 +56,8 @@ def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["offset"] = 5*sec
     blue_param["period"] = 10*min
     blue_param["duration"] = 10*min
-    blue_param["analog_value"] = 255
+    blue_param["analog_value"] = 255//5
+    
     
     
     trigger_param["offset"] = 3*sec
@@ -71,8 +72,8 @@ ex.observers.append(MongoObserver())
 @ex.config
 def cfg(arduino_LED):
         framerate = 1000/arduino_LED['trigger_param']['period']
-        exp_duration = 150*250//arduino_LED["blue_param"]["analog_value"]
-        downscale = 1
+        exp_duration = 60*250//arduino_LED["blue_param"]["analog_value"]//4
+        downscale = 3
 
 @ex.named_config
 def Daheng():

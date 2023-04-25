@@ -78,7 +78,7 @@ def add_digital_pulse(link, dic_param):
 
 @arduino_LED.capture
 def add_primary_digital_pulse(link, dic_param): 
-    return CSLleds.add_digital_pulse(link, dic_param)
+    return CSLleds.add_primary_digital_pulse(link, dic_param)
 
 @arduino_LED.capture
 def start_measurement(link):

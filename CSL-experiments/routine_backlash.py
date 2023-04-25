@@ -57,7 +57,7 @@ min = 60*1000
 def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["offset"] = 0
     blue_param["period"] = 2*min
-    blue_param["duration"] = 1*min
+    blue_param["duration"] = 2*min
     trigger_param["period"] = 1*sec
 
 
@@ -72,15 +72,17 @@ def cfg(arduino_LED):
 
     framerate = 1000/arduino_LED['trigger_param']['period']
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
-    cam_param =  {"TriggerMode": "Off",
+    cam_param =  {
+        "Exposure":1000*900,
+        "TriggerMode": "Off",
         "TriggerSource": "Software",
-        "Gain":"4",
+        "Gain":"10",
         }
 
 
 
     N=10
-    step=-10
+    step=1
 
     gears = [1, 100, 1]
     arduino_motors = "COM6"

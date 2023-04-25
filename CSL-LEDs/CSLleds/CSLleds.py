@@ -96,8 +96,8 @@ if __name__ == "__main__":
 
     blue_param = {'pin': 3,
             'offset': 500, #ms
-            'period': 5*1000, #ms
-            'duration': 2.5*1000, #ms
+            'period': 60*5*1000, #ms
+            'duration': 60*5*1000, #ms
             'secondary': 1,
             'analog_value': 255,
             }
@@ -105,15 +105,15 @@ if __name__ == "__main__":
     # purple
     purple_param = {'pin': 11,
                 'offset': 0,
-                'period': 10*1000,
-                'duration': 5*1000,
+                'period': 5*1000,
+                'duration': 2*1000,
                 'secondary': 0,
                 'analog_value': 255,
                  }
 
                  
     add_digital_pulse(link, blue_param)
-    add_digital_pulse(link, purple_param)
+    add_primary_digital_pulse(link, purple_param)
 
     start_measurement(link)
 

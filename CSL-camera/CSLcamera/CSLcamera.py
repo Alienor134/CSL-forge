@@ -32,10 +32,18 @@ import json
 import threading
 import skimage
 import ipdb
+import copy
+
+def clip(input_image, high = 99.99, low = 0.001):
+    im = copy.copy(input_image)
+    im[im<np.percentile(im, low)]=np.percentile(im, low)
+    im[im>np.percentile(im, high)]=np.percentile(im, high)
+    return im
+
 
 
 class Camera(threading.Thread):
-    def __init__(self, config_file, cam_param, downscale=1, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
+    def __init__(self, config_file, cam_param, downscale=3, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
       threading.Thread.__init__(self)
       f = open(config_file)
       config = json.load(f)
@@ -80,6 +88,8 @@ class Camera(threading.Thread):
     def get_param(self, key):
         return self.mmc.getProperty(self.name, key)
 
+
+
     def continuous_stream(self):
       cv2.namedWindow('live',cv2.WINDOW_NORMAL)
       self.mmc.startContinuousSequenceAcquisition(1)
@@ -116,8 +126,8 @@ class Camera(threading.Thread):
           frame = np.mean(frame, axis = 2)
           self.video.append(skimage.transform.downscale_local_mean(frame, self.downscale))
           self.timing.append(time.time())
-          image = np.array(Image.fromarray(np.uint8(frame)))
-          cv2.imshow('live', image)
+          self.image = np.array(Image.fromarray(np.uint8(frame)))
+          cv2.imshow('live',  cv2.normalize(clip(self.image), None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
           #print(np.mean(frame))
           i+=1
 
@@ -180,3 +190,20 @@ if __name__== "__main__":
 
   cam.snap_video(N_im)
   print(len(cam.video))
+
+
+
+  """
+  
+  im = image_list[3][500:1500,500:1500,0];lap = skimage.filters.laplace(im);plt
+.imshow(clip(lap), cmap="gray");plt.savefig("blur_lap.pdf",bbox_inches="tight");plt
+.show()
+  
+plt.imshow(lap24, cmap='gray', vmin=lap24.min(),vmax=lap24.max());plt.axis('o
+ff');plt.savefig("noblur_lap.pdf");plt.show()
+
+lap3
+
+
+EXPS 573, 568, 567
+  """

@@ -77,10 +77,10 @@ def Daheng():
     
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
     cam_param = { 
-        "Exposure":900000,
-        "TriggerMode":"Off",
-        "TriggerSource": "Software",
-        "Gain":"10",
+        "Exposure":1000*1000//11,
+        "TriggerMode":"On",
+        "TriggerSource": "Line2",
+        "Gain":23,
         }
 
 @ex.named_config
