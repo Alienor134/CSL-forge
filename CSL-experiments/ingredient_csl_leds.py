@@ -30,7 +30,7 @@ from serial import *
 import numpy as np
 from sacred import Ingredient
 
-from CSLleds import CSLleds
+from CSLlight import CSLlight
 from CSLserial import CSLserial
 
 arduino_LED = Ingredient('arduino_LED')
@@ -73,17 +73,17 @@ def create_link(port_arduino):
 
 @arduino_LED.capture
 def add_digital_pulse(link, dic_param):
-    return CSLleds.add_digital_pulse(link, dic_param)
+    return CSLlight.add_digital_pulse(link, dic_param)
 
 
 @arduino_LED.capture
 def add_primary_digital_pulse(link, dic_param): 
-    return CSLleds.add_primary_digital_pulse(link, dic_param)
+    return CSLlight.add_primary_digital_pulse(link, dic_param)
 
 @arduino_LED.capture
 def start_measurement(link):
-    return CSLleds.start_measurement(link)
+    return CSLlight.start_measurement(link)
 
 @arduino_LED.capture
 def stop_measurement(link):
-    return CSLleds.stop_measurement(link)
+    return CSLlight.stop_measurement(link)

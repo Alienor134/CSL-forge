@@ -96,8 +96,8 @@ if __name__ == "__main__":
 
     blue_param = {'pin': 3,
             'offset': 500, #ms
-            'period': 60*5*1000, #ms
-            'duration': 60*5*1000, #ms
+            'period': 5*1000, #ms
+            'duration': 2*1000, #ms
             'secondary': 1,
             'analog_value': 255,
             }

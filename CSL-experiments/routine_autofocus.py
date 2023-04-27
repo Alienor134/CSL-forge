@@ -246,7 +246,7 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     pos = voltage_list[-1]
     best_pos = voltage_list[np.argmax(blur_list)]
     
-    ipdb.set_trace()
+    #ipdb.set_trace()
     for i in range(len(voltage_list)):
             _run.log_scalar("blur", blur_list[i], voltage_list[i])
 

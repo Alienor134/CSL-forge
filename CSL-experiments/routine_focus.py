@@ -77,6 +77,8 @@ def Daheng():
     
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
     cam_param = { 
+        "SensorHeight":2048,
+        "SensorWidth":2448,
         "Exposure":1000*1000//11,
         "TriggerMode":"On",
         "TriggerSource": "Line2",

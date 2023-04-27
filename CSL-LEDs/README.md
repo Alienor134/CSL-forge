@@ -1,36 +1,86 @@
-# CSL-LEDs
+# CSL-light
 
 This repository demonstrates how to control light sources with Arduino and Python, and output a trigger signal to synchronize a camera. 
 
 The codes rely on [Arduino](https://www.arduino.cc/) and [pyserial](https://github.com/pyserial/pyserial).
 
 
-**Prerequisites**:
+#### Pre-requisites
 - Install RomiSerial and the Arduino software XXXX
-- The LEDs are already set-up (Note: to build an LED controller refer to this [OpenUC2 repository](https://github.com/SonyCSLParis/UC2_Fluorescence_microscope), otherwise you might already use one of these [Thorlabs controlers](https://www.thorlabs.com/navigation.cfm?guide_id=2109)
-- The light sources can be controlled by a pulse, or pulse-width modulated signal (PWM) 
+- The light sources are already set-up. Refer to the example gallery for ideas. 
+- The light sources can be controlled by a trigger, or pulse-width modulated signal (PWM) 
 - The code was tested on Windows and Linux
   
 
-## Install the library
+
+
+#### Hardware :gear:
+Here are the different hardware equipment the 
+
+| Component|      Quantity      |  Price per unit | Example|  
+|----------|:-------------:|------:|------:|  
+| Arduino Uno |    1   |   24€ | [Robotshop](https://www.robotshop.com/eu/fr/microcontroleur-arduino-uno-r3-usb.html)|  
+| Light source controller | tested up to 5 || [Thorlabs](https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=2616) |  
+| Connection wires | 2$N_{sources}$| |  
+
+#### Software :desktop_computer:
+
+
+| Software | Version we used | Download |
+|----------|:-------------:|:-------------:|  
+| Arduino | 1.8.13 | [download](https://www.arduino.cc/en/software)
+| Python  | 3 |[install](https://github.com/Alienor134/Teaching/blob/master/Python/Installing_Anaconda_creating_environment.md)
+| CSL-serial | 1.0 | [install](XXX)
+
+#### Codes and files provided :chart_with_upwards_trend:
+
+[CSLlight](CSLlight/CSLlight.py) can be used the following way:
+
+_______
+
+```python
+from serial import Serial
+from CSLlight import add_digital_pulse, start_measurement, stop_measurement
+
+arduino_port = "COM5"
+sec = 1000 #conversion ms to s
+blue_param = {'pin': 11,
+            'offset': 0.5*sec, #ms
+            'period': 5*sec, #ms
+            'duration': 2*sec, #ms
+            'secondary': 1,
+            'analog_value': 255,
+            }
+
+link = Serial(arduino_port)
+add_digital_pulse(link, blue_param)
+
+start_measurement(link)
+time.sleep(300)
+stop_measurement(link)
+
+```
+____
+
+#### Install the library
 
 ```
 git clone XXXXXXXX
-cd CSL-LEDs
+cd CSL-light
 python setup.py develop
 ```
 
 
 
 ## Control the LEDs 
-1. Connect the LED controller to the Arduino. 
+1. Get the wiring to connect the Arduino to the light source controller. To begin, connect the wire to **pin 11**. 
 
 2. Open the [.ino](/ArduinoControl/LEDControl/LEDControl.ino) file.
 3. Select the Arduino board type in the "Tools/card type"
 <p align="center">
 <a> <img src="./Images/2023-04-07-18-41-01.png" width="500"></a>
 </p>
-4. Select the COM port. If the name of the board doesn't appear near any port, change the port USB until the name appears.
+1. Select the COM port. If the name of the board doesn't appear near any port, change the port USB until the name appears.
 
 <p align="center">
 <a> <img src="./Images/2023-01-30-10-16-46.png" width="300"></a>
@@ -49,24 +99,24 @@ python setup.py develop
 </p>
 
 
-8. Run the code, you should see the LEDs blink.
+8. Run the code, you should see the LEDs blink several times in a minute. 
 
 
 On Windows
 
-```python CSLleds/CSLleds.py```
+```python CSLlight/CSLlight.py```
 
 or
 
-```python CSLleds/CSLleds.py --port COMx```
+```python  CSLlight/CSLlight.py --port COMx```
 
 
 On Linux
 
-```python3 CSLleds/CSLleds.py --port /dev/ttyACM0```
+```python3  CSLlight/CSLlight.py --port /dev/ttyACM0```
 
 
-8. Open the python code to see how it works. Open the python code [CSLleds.py](CSLleds/CSLleds.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
+8. Open the python code to see how it works. Open the python code [CSLlight.py](CSLlight/CSLlight.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
 The content of interest is after ``if __name__ == __main__:`` 
 - replace the COM port with the one of your set-up ([tutorial](https://www.arduino.cc/en/Guide/ArduinoUno)). 
 - input the correct ports for the LED control. The port 3 and 11 are good choices because they are PWM pins which allow to control the intensity level of the LEDs rather than only ON-OFF. 
@@ -77,6 +127,13 @@ The content of interest is after ``if __name__ == __main__:``
 </p>
 
 
+
+### Examples of implementation
+[How to make a gallery](https://felixhayashi.github.io/ReadmeGalleryCreatorForGitHub/)
+<img src="https://user-images.githubusercontent.com/20478886/234872724-da883014-1684-44de-990e-df7d44519121.jpg" width="23%"></img> <img src="https://user-images.githubusercontent.com/20478886/234872732-5f4d47e1-c07f-44dd-aca3-51e3991e7339.jpg" width="23%"></img> <img src="https://user-images.githubusercontent.com/20478886/234872739-b0aa864d-2f81-4400-b28f-3969fe8763bd.jpg" width="23%"></img> 
+
+
+(Note: to build an LED controller refer to this [OpenUC2 repository](https://github.com/SonyCSLParis/UC2_Fluorescence_microscope), otherwise you might already use one of these [Thorlabs controlers](https://www.thorlabs.com/navigation.cfm?guide_id=2109)
 
 ### License
 

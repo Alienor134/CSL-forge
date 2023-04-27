@@ -7,7 +7,7 @@ install_requires = [
 ]
 
 
-setup(name="CSLleds",
+setup(name="CSLlight",
 version="0.0.1",
 description="A class to control cameras interfaced with Micro-Manager",
 author="Peter Hanappe, Alienor Lahlou",

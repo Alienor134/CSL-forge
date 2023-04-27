@@ -7,6 +7,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from joblib import delayed
 from joblib import wrap_non_picklable_objects
 
+import CSLtools.CSLtools as CSLtools
 
 save_folder = "../images/"
 extension= ".pdf"
@@ -95,10 +96,10 @@ def plot_map(I_000, I_000_map, save_name, limits = (0,0)):
     # histogram of intensities
     I_000_distrib = I_000[(I_000>Q1)*(I_000<Q3)].flatten()
 
-    fig = plt.figure()
+    fig, ax = CSLtools.set_figure("%d", "%d")
     ax = plt.gca()
     
-    plt.xlabel(r"Light intensity ($\mu Eins /m^2/s$)")
+    plt.xlabel(r"$light$ $intensity$ ($\mathrm{\mu E \cdot m^2 \cdot s^{-1}}$)")
     plt.ylabel("")
     ax.tick_params(axis='both', which='major', direction = 'in', top = True, right = True)
     _, bins, _ = plt.hist(I_000_distrib, 15, density= False, alpha=1, facecolor = "white", edgecolor = "black")
