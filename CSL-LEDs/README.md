@@ -5,7 +5,7 @@ This repository demonstrates how to control light sources with Arduino and Pytho
 The codes rely on [Arduino](https://www.arduino.cc/) and [pyserial](https://github.com/pyserial/pyserial).
 
 
-#### Pre-requisites
+## Pre-requisites
 - Install RomiSerial and the Arduino software XXXX
 - The light sources are already set-up. Refer to the example gallery for ideas. 
 - The light sources can be controlled by a trigger, or pulse-width modulated signal (PWM) 
@@ -14,7 +14,7 @@ The codes rely on [Arduino](https://www.arduino.cc/) and [pyserial](https://gith
 
 
 
-#### Hardware :gear:
+## Hardware :gear:
 Here are the different hardware equipment the 
 
 | Component|      Quantity      |  Price per unit | Example|  
@@ -23,7 +23,7 @@ Here are the different hardware equipment the
 | Light source controller | tested up to 5 || [Thorlabs](https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=2616) |  
 | Connection wires | 2$N_{sources}$| |  
 
-#### Software :desktop_computer:
+## Software :desktop_computer:
 
 
 | Software | Version we used | Download |
@@ -32,7 +32,7 @@ Here are the different hardware equipment the
 | Python  | 3 |[install](https://github.com/Alienor134/Teaching/blob/master/Python/Installing_Anaconda_creating_environment.md)
 | CSL-serial | 1.0 | [install](XXX)
 
-#### Codes and files provided :chart_with_upwards_trend:
+## Codes and files provided :chart_with_upwards_trend:
 
 [CSLlight](CSLlight/CSLlight.py) can be used the following way:
 
@@ -62,7 +62,7 @@ stop_measurement(link)
 ```
 ____
 
-#### Install the library
+## Install the library
 
 ```
 git clone XXXXXXXX
@@ -128,13 +128,13 @@ The content of interest is after ``if __name__ == __main__:``
 
 
 
-### Examples of implementation
+## Examples of implementation
 [How to make a gallery](https://felixhayashi.github.io/ReadmeGalleryCreatorForGitHub/)
 <img src="https://user-images.githubusercontent.com/20478886/234872724-da883014-1684-44de-990e-df7d44519121.jpg" width="23%"></img> <img src="https://user-images.githubusercontent.com/20478886/234872732-5f4d47e1-c07f-44dd-aca3-51e3991e7339.jpg" width="23%"></img> <img src="https://user-images.githubusercontent.com/20478886/234872739-b0aa864d-2f81-4400-b28f-3969fe8763bd.jpg" width="23%"></img> 
 
 
 (Note: to build an LED controller refer to this [OpenUC2 repository](https://github.com/SonyCSLParis/UC2_Fluorescence_microscope), otherwise you might already use one of these [Thorlabs controlers](https://www.thorlabs.com/navigation.cfm?guide_id=2109)
 
-### License
+## License
 
 This project is licensed under the [GNU General Public License v3.0](https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3)
