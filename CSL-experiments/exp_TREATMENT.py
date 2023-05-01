@@ -56,7 +56,7 @@ def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["offset"] = 250*sec + 20*sec
     blue_param["period"] = 30*min
     blue_param["duration"] = 30*min
-    blue_param["analog_value"] = 255//5
+    blue_param["analog_value"] = 255//2
     blue_param["secondary"] = 1
     
 

@@ -53,14 +53,14 @@ min = 60*1000
 @arduino_LED.config
 def update_cfg(blue_param, purple_param, trigger_param):
 
-    blue_param["offset"] = 250*sec + 20*sec
+    blue_param["offset"] = 25*sec + 20*sec
     blue_param["period"] = 30*min
     blue_param["duration"] = 15*min
     blue_param["analog_value"] = 255//5
     blue_param["secondary"] = 1
     
 
-    purple_param["offset"] = 250*sec + 10*sec
+    purple_param["offset"] = 25*sec + 10*sec
     purple_param["period"] = 20*sec
     purple_param["duration"] = 200 #ms
     purple_param["analog_value"] = 190
@@ -80,7 +80,7 @@ ex.observers.append(MongoObserver())
 @ex.config
 def cfg(arduino_LED):
         framerate = 1000/arduino_LED['trigger_param']['period']
-        exp_duration = 250 + 30*60
+        exp_duration = 25 + 2*60
         downscale = 10
 
 @ex.named_config
@@ -100,7 +100,7 @@ def UEye():
 
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
-                "Exposure": 997,
+                "Exposure": 170,
                  "Gain": 100}
 
 #@ex.capture()

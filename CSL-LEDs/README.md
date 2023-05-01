@@ -34,9 +34,12 @@ Here are the different hardware equipment the
 
 ## Codes and files provided :chart_with_upwards_trend:
 
+
+An [Arduino code](LEDControl/LEDControl.ino) is provided to control the motors. An extra layer is added in Python to control it easily.
+
 [CSLlight](CSLlight/CSLlight.py) can be used the following way:
 
-_______
+
 
 ```python
 from serial import Serial
@@ -60,19 +63,17 @@ time.sleep(300)
 stop_measurement(link)
 
 ```
-____
 
-## Install the library
 
+# Instructions:
+Download or clone the repository:
 ```
 git clone XXXXXXXX
-cd CSL-light
-python setup.py develop
 ```
 
-
-
 ## Control the LEDs 
+
+
 1. Get the wiring to connect the Arduino to the light source controller. To begin, connect the wire to **pin 11**. 
 
 2. Open the [.ino](/ArduinoControl/LEDControl/LEDControl.ino) file.
@@ -99,24 +100,25 @@ python setup.py develop
 </p>
 
 
-8. Run the code, you should see the LEDs blink several times in a minute. 
+8. type: **#?:[11,0,0,2,0,1,0,0,255]**
+   You should see the LEDs blink (frequency 0.5Hz) 
+
+## Install the library
+
+```
+cd CSL-light
+python setup.py develop
+```
+1. Try running the code: 
+
+On Windows: ```python  CSLlight/CSLlight.py --port COMx``` by replacing "COMx" by the correct COM port identified in step 1. 
 
 
-On Windows
+On Linux: ```python3  CSLlight/CSLlight.py --port /dev/ttyACM0```
 
-```python CSLlight/CSLlight.py```
+You should see the LED blink. 
 
-or
-
-```python  CSLlight/CSLlight.py --port COMx```
-
-
-On Linux
-
-```python3  CSLlight/CSLlight.py --port /dev/ttyACM0```
-
-
-8. Open the python code to see how it works. Open the python code [CSLlight.py](CSLlight/CSLlight.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
+2. Open the python code to see how it works. Open the python code [CSLlight.py](CSLlight/CSLlight.py). The code is commented and allows to control the frequency and amplitude of the LEDs. Set the parameters: 
 The content of interest is after ``if __name__ == __main__:`` 
 - replace the COM port with the one of your set-up ([tutorial](https://www.arduino.cc/en/Guide/ArduinoUno)). 
 - input the correct ports for the LED control. The port 3 and 11 are good choices because they are PWM pins which allow to control the intensity level of the LEDs rather than only ON-OFF. 

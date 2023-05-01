@@ -89,7 +89,8 @@ def Daheng():
 def UEye():
 
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
-    cam_param = {"Exposure": 97,
+    cam_param = {"Trigger":"internal",
+        "Exposure": 97,
                  "Gain": 100}
     
 
