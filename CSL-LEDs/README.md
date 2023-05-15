@@ -43,7 +43,7 @@ An [Arduino code](LEDControl/LEDControl.ino) is provided to control the motors. 
 
 ```python
 from serial import Serial
-from CSLlight import add_digital_pulse, start_measurement, stop_measurement
+from CSLlight import ControlLight
 
 arduino_port = "COM5"
 sec = 1000 #conversion ms to s
@@ -55,12 +55,12 @@ blue_param = {'pin': 11,
             'analog_value': 255,
             }
 
-link = Serial(arduino_port)
-add_digital_pulse(link, blue_param)
+arduino_light = ControlLight(arduino_port)
+arduino_light.add_digital_pulse(blue_param)
 
-start_measurement(link)
+arduino_light.start_measurement()
 time.sleep(300)
-stop_measurement(link)
+arduino_light.stop_measurement()
 
 ```
 
