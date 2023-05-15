@@ -22,12 +22,14 @@
 
  */
 
-#include <string>
-#include "IInputStream.h"
-#include "IOutputStream.h"
-
 #ifndef __ROMISERIAL_RSERIAL_H
 #define __ROMISERIAL_RSERIAL_H
+
+#include <string>
+#include <memory>
+#include "IInputStream.h"
+#include "IOutputStream.h"
+#include "ILog.h"
 
 namespace romiserial {
         
@@ -37,12 +39,13 @@ namespace romiserial {
         class RSerial : public IInputStream, public IOutputStream
         {
         protected:
-                std::string _device;
-                int _fd;
-                double _timeout;
-                uint32_t _baudrate;
-                bool _reset;
-                int _timeout_ms;
+                std::string device_;
+                int fd_;
+                double timeout_;
+                uint32_t baudrate_;
+                bool reset_;
+                std::shared_ptr<ILog> log_;
+                int timeout_ms_;
         
                 void open_device();
                 void configure_termios();
@@ -52,7 +55,8 @@ namespace romiserial {
                 bool poll_write();
 
         public:
-                RSerial(const std::string& device, uint32_t baudrate, bool reset);
+                RSerial(const std::string& device, uint32_t baudrate,
+                        bool reset, std::shared_ptr<ILog> log);
                 virtual ~RSerial();
 
                 void set_timeout(double seconds) override;

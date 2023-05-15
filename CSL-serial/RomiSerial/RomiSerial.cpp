@@ -8,7 +8,7 @@
 
   romi-rover is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
+  the Free Software Foundation, either version 3 of the Lƒicense, or
   (at your option) any later version.
 
   This program is distributed in the hope that it will be useful, but
@@ -26,16 +26,15 @@
 #include "RomiSerial.h"
 #include "RomiSerialErrors.h"
 #include "Printer.h"
-#include "Util.h"
+#include "RomiSerialUtil.h"
 #include <stdio.h>
 
 namespace romiserial {
 
-        RomiSerial::RomiSerial(IInputStream& in, IOutputStream& out,
-                               const MessageHandler *handlers, uint8_t num_handlers)
+        RomiSerial::RomiSerial(IInputStream& in, IOutputStream& out)
                 : in_(in), out_(out),
-                  handlers_(handlers),
-                  num_handlers_(num_handlers),
+                  handlers_(nullptr),
+                  num_handlers_(0),
                   envelope_parser_(),
                   message_parser_(),
                   sent_response_(false),
@@ -44,12 +43,24 @@ namespace romiserial {
         {
         }
 
+        RomiSerial::RomiSerial(IInputStream& in, IOutputStream& out,
+                               const MessageHandler *handlers, uint8_t num_handlers)
+                : RomiSerial(in, out) {
+                set_handlers(handlers, num_handlers);
+        }
+
+        void RomiSerial::set_handlers(const MessageHandler *handlers, uint8_t num_handlers)
+        {
+                handlers_ = handlers;
+                num_handlers_ = num_handlers;
+        }
+
         void RomiSerial::handle_input()
         {
                 char c;
                 while (in_.available()) {
                         if (in_.read(c)) {
-                               handle_char(c);
+                                handle_char(c);
                         }
                 }
         }
@@ -250,3 +261,4 @@ namespace romiserial {
                 printer.print(":xxxx\r\n");
         }
 }
+

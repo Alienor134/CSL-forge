@@ -39,9 +39,9 @@ import ipdb
 import tifffile
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from ingredient_csl_leds import arduino_LED, get_arduino_light
 from ingredient_save_folder import save_folder, make_folder
-from CSLcamera.CSLcamera import Camera
+from CSLcamera import ControlCamera
 
 
 from sacred.observers import MongoObserver
@@ -106,17 +106,17 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     save_folder =  make_folder(_run)
     ### initialize devices
     ##ARDUINO
-    link = create_link(arduino_LED['port_arduino'])
+    arduino_light = get_arduino_light(arduino_LED['port_arduino'])
 
-    cam = Camera(cam_type, cam_param, downscale)
+    cam = ControlCamera(cam_type, cam_param, downscale)
     #cam.camera_mode = "snap_video"
     #cam.N_im = framerate*exp_duration
 
     #blue LED
-    add_digital_pulse(link,  arduino_LED['blue_param'])
+    arduino_light.add_digital_pulse(arduino_LED['blue_param'])
 
     #camera trigger
-    add_digital_pulse(link,  arduino_LED['trigger_param'])
+    arduino_light.add_digital_pulse(arduino_LED['trigger_param'])
 
     #purple LED
     #add_primary_digital_pulse(link, purple_param)
@@ -124,10 +124,10 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
 
     #cam.start()
     
-    start_measurement(link)
+    arduino_light.start_measurement()
 
     cam.snap_video(framerate*exp_duration)
-    stop_measurement(link)
+    arduino_light.stop_measurement()
     #cam.join()
 
     result, timing = np.array(cam.video), np.array(cam.timing)

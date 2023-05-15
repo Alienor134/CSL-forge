@@ -28,9 +28,11 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include <IRomiSerialClient.h>
 #include <IInputStream.h>
 #include <IOutputStream.h>
+#include <ILog.h>
 #include <EnvelopeParser.h>
 #include <RomiSerialErrors.h>
 
@@ -46,54 +48,56 @@ namespace romiserial {
         static const uint32_t kDefaultBaudRate = 115200;
 
         using SynchronizedCodeBlock = std::lock_guard<std::mutex>;
+        
         class RomiSerialClient : public IRomiSerialClient
         {
         protected:
-                std::shared_ptr<IInputStream> _in;
-                std::shared_ptr<IOutputStream> _out;
-                std::mutex _mutex;
-                uint8_t _id; 
-                bool _debug;
-                EnvelopeParser _parser;
-                JsonCpp default_response_;
+                std::shared_ptr<IInputStream> in_;
+                std::shared_ptr<IOutputStream> out_;
+                std::shared_ptr<ILog> log_;
+                std::mutex mutex_;
+                uint8_t id_; 
+                bool debug_;
+                EnvelopeParser parser_;
+                nlohmann::json default_response_;
                 double timeout_;
+                const std::string client_name_;
                 
                 int make_request(const std::string &command, std::string &request);
-                JsonCpp try_sending_request(std::string &request);
+                nlohmann::json try_sending_request(std::string &request);
                 bool send_request(std::string &request);
-                JsonCpp make_error(int code);
+                nlohmann::json make_error(int code);
                 bool handle_one_char();
                 bool parse_char(int c);
-                JsonCpp parse_response();
-                JsonCpp read_response();
+                nlohmann::json parse_response();
+                nlohmann::json read_response();
                 bool can_write();
                 bool filter_log_message();
-                JsonCpp check_error_response(JsonCpp& data);
-                JsonCpp make_default_response();
+                nlohmann::json check_error_response(nlohmann::json& data);
+                nlohmann::json make_default_response();
                 std::string substitute_metachars(const std::string& command);
 
         public:
         
-                static std::unique_ptr<IRomiSerialClient> create(const std::string& device);
+                static std::unique_ptr<IRomiSerialClient>
+                        create(const std::string& device,
+                               const std::string& client_name,
+                               std::shared_ptr<ILog> log);
+                
                 static uint8_t any_id();
                 
-                explicit RomiSerialClient(std::shared_ptr<IInputStream> in, std::shared_ptr<IOutputStream> out, uint8_t start_id);
+                explicit RomiSerialClient(std::shared_ptr<IInputStream> in,
+                                          std::shared_ptr<IOutputStream> out,
+                                          std::shared_ptr<ILog> log,
+                                          uint8_t start_id,
+                                          const std::string& client_name);
                 RomiSerialClient(const RomiSerialClient&) = delete;
                 RomiSerialClient& operator=(const RomiSerialClient&) = delete;
                 ~RomiSerialClient() override;
 
-                uint8_t id() {
-                        return _id;
-                }
-        
-                void send(const char *command, JsonCpp& response) override;
-        
-                /* bool read(uint8_t *data, size_t length) override; */
-                /* bool write(const uint8_t *data, size_t length) override; */
-        
-                void set_debug(bool value) override {
-                        _debug = value;
-                }
+                uint8_t id();
+                void send(const char *command, nlohmann::json& response) override;        
+                void set_debug(bool value) override;
         
                 static const char *get_error_message(int code);        
         };

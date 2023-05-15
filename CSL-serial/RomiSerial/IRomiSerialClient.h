@@ -24,7 +24,7 @@
 #ifndef __ROMISERIAL_IROMISERIALCLIENT_H
 #define __ROMISERIAL_IROMISERIALCLIENT_H
 
-#include "JsonCpp.h"
+#include <json.hpp>
 
 namespace romiserial {
 
@@ -49,7 +49,7 @@ namespace romiserial {
                  *  first value is not zero then the second element of the
                  *  array is a string with a human-readable error message.
                  */
-                virtual void send(const char *request, JsonCpp& response) = 0;
+                virtual void send(const char *request, nlohmann::json& response) = 0;
 
                 /* virtual bool read(uint8_t *data, size_t length) = 0; */
                 /* virtual bool write(const uint8_t *data, size_t length) = 0; */

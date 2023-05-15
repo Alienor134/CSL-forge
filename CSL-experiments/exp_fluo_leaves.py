@@ -37,8 +37,8 @@ import tempfile
 
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
-from CSLcamera.CSLcamera import Camera
+from ingredient_csl_leds import arduino_LED, get_arduino_light
+from CSLcamera import ControlCamera
 
 
 from sacred.observers import MongoObserver
@@ -59,40 +59,51 @@ ex = Experiment('fluo_leaf', ingredients=[arduino_LED])
 ex.observers.append(MongoObserver())
 
 
+@ex.named_config
+def Daheng():
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
+
+    cam_param = {"Exposure": 150*1000,
+                 "Gain": 23,
+                 "SensorHeight":2048,
+                "SensorWidth":2448,
+                "TriggerMode": "On",
+                "TriggerSource":"Line2"}
+
 @ex.config
-def cfg(arduino_LED):
-
-    framerate = 1000/arduino_LED['trigger_param']['period']
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
-    cam_param = {}
+def UEye():
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_param = {"Frame Rate":1,
+                "Exposure": 170,
+                 "Gain": 100}
     exp_duration = 2*60
-
+    framerate = 1
 
 @ex.automain
 def run(_run, cam_type, cam_param, exp_duration, framerate, arduino_LED):
 
     ### initialize devices
     ##ARDUINO
-    link = create_link(arduino_LED['port_arduino'])
+    arduino_light = get_arduino_light(arduino_LED['port_arduino'])
 
 
-    cam = Camera(cam_type, cam_param)
+    cam = ControlCamera(cam_type, cam_param)
 
 
     #blue LED
-    add_digital_pulse(link,  arduino_LED['blue_param'])
+    arduino_light.add_digital_pulse(arduino_LED['blue_param'])
 
     #camera trigger
-    add_digital_pulse(link,  arduino_LED['trigger_param'])
+    arduino_light.add_digital_pulse(arduino_LED['trigger_param'])
 
     #purple LED
     #add_primary_digital_pulse(link, purple_param)
 
-    start_measurement(link)
+    arduino_light.start_measurement()
 
     result, timing = cam.snap_video(exp_duration*framerate)
 
-    stop_measurement(link)
+    arduino_light.stop_measurement()
 
 
     ftmp = tempfile.NamedTemporaryFile(delete=False)

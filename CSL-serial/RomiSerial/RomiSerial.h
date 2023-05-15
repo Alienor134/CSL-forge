@@ -33,20 +33,6 @@
 
 namespace romiserial {
 
-        class RomiSerial;
-
-        typedef void (*MessageCallback)(RomiSerial *romi_serial,
-                                        int16_t *args,
-                                        const char *string_arg);
-
-        struct MessageHandler 
-        {
-                char opcode;
-                uint8_t number_arguments;
-                bool requires_string;
-                MessageCallback callback;
-        };
-
         class RomiSerial : public IRomiSerial
         {
         protected:
@@ -77,6 +63,7 @@ namespace romiserial {
 
         public:
 
+                RomiSerial(IInputStream& in, IOutputStream& out);
                 RomiSerial(IInputStream& in, IOutputStream& out,
                            const MessageHandler *handlers, uint8_t num_handlers);
                 RomiSerial(const RomiSerial&) = delete;
@@ -84,6 +71,8 @@ namespace romiserial {
 
                 ~RomiSerial() override = default;
 
+                void set_handlers(const MessageHandler *handlers,
+                                  uint8_t num_handlers) override;
                 void handle_input() override;
                 void send_ok() override;
                 void send_error(int code, const char *message) override;

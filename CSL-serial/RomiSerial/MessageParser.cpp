@@ -164,8 +164,9 @@ namespace romiserial {
                                 break;
                         }
                 }
-                if (_error == 0)
+                if (_error == 0) {
                         success = process(s[len-1]);
+                }
                 return success;
         }
 

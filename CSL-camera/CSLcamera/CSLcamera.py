@@ -33,6 +33,10 @@ import threading
 import skimage
 import ipdb
 import copy
+import pandas as pd
+import tifffile
+
+
 
 def clip(input_image, high = 99.99, low = 0.001):
     im = copy.copy(input_image)
@@ -42,7 +46,7 @@ def clip(input_image, high = 99.99, low = 0.001):
 
 
 
-class Camera(threading.Thread):
+class ControlCamera(threading.Thread):
     def __init__(self, config_file, cam_param, downscale=3, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
       threading.Thread.__init__(self)
       f = open(config_file)
@@ -97,6 +101,8 @@ class Camera(threading.Thread):
         if self.mmc.getRemainingImageCount() > 0:
           self.frame = self.mmc.popNextImage()
           self.image = np.array(Image.fromarray(np.uint8(self.frame)))
+          self.image[self.image<np.quantile(self.image, 0.99)] = 0
+
           cv2.imshow('live', cv2.normalize(self.image, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -127,7 +133,9 @@ class Camera(threading.Thread):
           self.video.append(skimage.transform.downscale_local_mean(frame, self.downscale))
           self.timing.append(time.time())
           self.image = np.array(Image.fromarray(np.uint8(frame)))
+
           cv2.imshow('live',  cv2.normalize(clip(self.image), None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
+          #
           #print(np.mean(frame))
           i+=1
 
@@ -152,13 +160,33 @@ class Camera(threading.Thread):
             raise ValueError("Invalid mode: {}".format(self.camera.mode))      
 
 
+    def save_video(self, _run, save_folder):
+        result, timing = np.array(cam.video), np.array(cam.timing)
+        fname = save_folder + "/video.tiff"
+        tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
+                
+        fname_t = save_folder + '/video_timing.csv'
+        pd.DataFrame(timing).to_csv(fname_t)
+
+
+        #ftmp = tempfile.NamedTemporaryFile(delete=False)
+        #fname = ftmp.name + ".pkl"
+        #with open(fname,'wb') as f:
+        #    pickle.dump(result, f)
+
+        #_run.add_artifact(fname, "video.npy")
+
+        _run.add_artifact(fname, "video.tiff")
+        _run.add_artifact(fname, "video_timing.csv")
+        return result, timing
+
 if __name__== "__main__": 
     
   """ init camera"""
 
   """ DAHENG """
   cam_param = {"TriggerSource": "Software"}
-  cam = Camera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
+  cam = ControlCamera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
 
   """ UEYE """
   #cam_param = {"Trigger": "internal"}

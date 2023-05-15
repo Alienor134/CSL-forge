@@ -37,11 +37,10 @@ import time as TIMING
 
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
-from CSLcamera.CSLcamera import Camera
+from ingredient_csl_leds import arduino_LED, get_arduino_light
+from CSLcamera import ControlCamera
 
-from CSLstage.CSLstage import CSLstage
-from CSLstage.interface_motors import interface_motors
+from CSLstage import ControlStage, interface_motors
 
 
 from sacred.observers import MongoObserver
@@ -99,17 +98,17 @@ def run(_run, cam_type, cam_param, arduino_LED, arduino_motors, gears):
 
 
     
-    link_LED = create_link(arduino_LED['port_arduino'])
-    stage = CSLstage(arduino_motors, gears)
+    link_LED = get_arduino_light(arduino_LED['port_arduino'])
+    stage = ControlStage(arduino_motors, gears)
 
     #blue LED
-    add_digital_pulse(link_LED,  arduino_LED['blue_param'])
+    link_LED.add_digital_pulse(arduino_LED['blue_param'])
 
     #camera trigger
-    add_digital_pulse(link_LED,  arduino_LED['trigger_param'])
-    cam = Camera(cam_type, cam_param)
+    link_LED.add_digital_pulse(arduino_LED['trigger_param'])
+    cam = ControlCamera(cam_type, cam_param)
 
-    start_measurement(link_LED)
+    link_LED.start_measurement()
 
     cam.camera_mode = "continuous_stream"
 
@@ -125,7 +124,7 @@ def run(_run, cam_type, cam_param, arduino_LED, arduino_motors, gears):
     motor_thread.join()
     #ipdb.set_trace()
     
-    stop_measurement(link_LED)
+    link_LED.stop_measurement()
 
     ftmp = tempfile.NamedTemporaryFile(delete=False)
     fname = ftmp.name + ".png"

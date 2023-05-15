@@ -39,9 +39,9 @@ import ipdb
 import tifffile
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from ingredient_csl_leds import arduino_LED, get_arduino_light
 from ingredient_save_folder import save_folder, make_folder
-from CSLcamera.CSLcamera import Camera
+from CSLcamera import ControlCamera
 
 
 from sacred.observers import MongoObserver
@@ -68,22 +68,25 @@ def update_cfg(blue_param, purple_param, trigger_param):
 ex = Experiment('DDAO', ingredients=[arduino_LED, save_folder ])
 ex.observers.append(MongoObserver())
 
+@ex.named_config
+def Daheng():
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
 
-@ex.config
-def cfg(arduino_LED):
-
-    framerate = 1000/arduino_LED['trigger_param']['period']
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
     cam_param = {"TriggerMode":"Off",
                  "TriggerSource":"Software",
                 "Exposure": 900000,
                  "Gain": 23,
                  "SensorHeight":2048//4,
                 "SensorWidth":2448//4,}
-    
+
+@ex.config
+def UEye(arduino_LED):
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_param = {"Frame Rate":1,
+                "Exposure": 170,
+                 "Gain": 100}
     exp_duration = 2
-
-
+    framerate = 1000/arduino_LED['trigger_param']['period']
 
 
 @ex.automain
@@ -92,29 +95,29 @@ def run(_run, cam_type, cam_param, exp_duration, framerate, arduino_LED):
     save_folder =  make_folder(_run)
     ### initialize devices
     ##ARDUINO
-    link = create_link(arduino_LED['port_arduino'])
+    arduino_light = get_arduino_light(arduino_LED['port_arduino'])
 
 
-    cam = Camera(cam_type, cam_param)
+    cam = ControlCamera(cam_type, cam_param)
 
 
     #blue LED
     #add_digital_pulse(link,  arduino_LED['blue_param'])
 
     #purple LED
-    add_digital_pulse(link,  arduino_LED['blue_param'])
+    arduino_light.add_digital_pulse(arduino_LED['blue_param'])
 
     #camera trigger
-    add_digital_pulse(link,  arduino_LED['trigger_param'])
+    arduino_light.add_digital_pulse(arduino_LED['trigger_param'])
 
     #purple LED
     #add_primary_digital_pulse(link, purple_param)
     print('It will last ', exp_duration, 'seconds.')
-    start_measurement(link)
+    arduino_light.start_measurement()
 
     cam.snap_image()
 
-    stop_measurement(link)
+    arduino_light.stop_measurement()
     
     im = np.array(cam.frame)
     fname = save_folder + "/image.tiff"

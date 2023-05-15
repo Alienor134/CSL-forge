@@ -22,10 +22,6 @@
 
  */
 
-#if !defined(ARDUINO)
-#include <r.h>
-#endif
-
 #include "EnvelopeParser.h"
 #include "RomiSerialErrors.h"
 #include "Log.h"
@@ -185,8 +181,8 @@ namespace romiserial {
                                         Serial.print(crc, HEX);
                                         Serial.print(":xxxx\r\n");
 #else
-                                        r_warn("CRC mismatch: got %02x, expected %02x",
-                                               _crc_metadata, crc) ;
+                                        // r_warn("CRC mismatch: got %02x, expected %02x",
+                                        //        _crc_metadata, crc) ;
 #endif
                                 }
                         } else {

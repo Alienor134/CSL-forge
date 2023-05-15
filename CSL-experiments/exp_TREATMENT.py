@@ -95,7 +95,7 @@ def Daheng():
                 "TriggerMode": "On",
                 "TriggerSource":"Line2"}
 
-@ex.named_config
+@ex.config
 def UEye():
 
     cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 

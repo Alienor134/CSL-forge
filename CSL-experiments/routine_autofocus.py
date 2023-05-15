@@ -41,12 +41,12 @@ import time as TIMING
 
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from ingredient_csl_leds import arduino_LED, get_arduino_light
 from ingredient_save_folder import save_folder, make_folder
 
-from CSLcamera.CSLcamera import Camera
+from CSLcamera import ControlCamera
 
-from CSLstage.CSLstage import CSLstage
+from CSLstage import ControlStage
 
 
 from sacred.observers import MongoObserver
@@ -74,15 +74,6 @@ def cfg(arduino_LED):
 
 
     framerate = 1000/arduino_LED['trigger_param']['period']
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"
-    cam_param =  {
-        "Exposure":1000*900,
-        "TriggerMode": "Off",
-        "TriggerSource": "Software",
-        "Gain":"10",
-        }
-
-
 
     N=10
     step=200
@@ -92,6 +83,25 @@ def cfg(arduino_LED):
 
 
 
+@ex.named_config
+def Daheng():
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
+
+    cam_param = {"Exposure": 900*1000,
+                 "Gain": 10,
+                 "SensorHeight":2048,
+                "SensorWidth":2448,
+                "TriggerMode": "Off",
+                "TriggerSource":"Software"}
+
+@ex.config
+def UEye():
+    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_param = {"Frame Rate":1,
+                "Exposure": 900,
+                 "Gain": 100, 
+                 "Trigger":"internal"}
+    
 @ex.automain
 def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     
@@ -124,10 +134,10 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
     
     save_folder =  make_folder(_run)
 
-    link_LED = create_link(arduino_LED['port_arduino'])
-    stage = CSLstage(arduino_motors, gears)
+    link_LED = get_arduino_light(arduino_LED['port_arduino'])
+    stage = ControlStage(arduino_motors, gears)
 
-    cam = Camera(cam_type, cam_param)
+    cam = ControlCamera(cam_type, cam_param)
 
 
     def focus(pos, N, step, link_LED, stage):
@@ -137,11 +147,11 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
 
 
 
-        add_digital_pulse(link_LED, arduino_LED['blue_param'])
+        link_LED.add_digital_pulse(arduino_LED['blue_param'])
 
         positions = []
         position = pos + min 
-        start_measurement(link_LED)
+        link_LED.start_measurement()
         images = []
         TIMING.sleep(2)
         stage.move_dz(stage.backlash_neg)
@@ -190,7 +200,7 @@ def run(_run, cam_type, cam_param, N, step, arduino_LED, arduino_motors, gears):
             image = np.array(Image.fromarray(np.uint8(frame)))
             images.append(image)
         
-        stop_measurement(link_LED)
+        link_LED.stop_measurement()
     
         
         #show_images(images, cols = 3)

@@ -68,7 +68,7 @@ namespace romiserial {
                         return _id;
                 }
 
-                bool has_id() {
+                bool has_id() const {
                         return _has_id;
                 }
         
@@ -76,15 +76,19 @@ namespace romiserial {
                         return _crc.get();
                 }
         
-                int8_t error() {
+                int8_t error() const {
                         return _error;
                 }
         
                 const char *message() {
                         return _message;
                 }
+
+                const char *message_content() {
+                    return _message + 1 ; // Skip #
+                }
         
-                uint8_t length() {
+                uint8_t length() const {
                         return _message_length;
                 }
         

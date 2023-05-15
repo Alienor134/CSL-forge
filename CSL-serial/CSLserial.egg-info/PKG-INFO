@@ -5,3 +5,4 @@ Summary: Serial interface Arduino-Python
 Author: Peter Hanappe
 Author-email: peter@hanappe.com
 License: GPLv3
+License-File: LICENSE
