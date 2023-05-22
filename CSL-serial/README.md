@@ -21,7 +21,7 @@ python setup.py develop
 4. In this location, copy the [RomiSerial](XXXXX) folder of the repository. 
 
 
-![](2023-04-07-18-32-25.png)
+![](Images/2023-04-07-18-32-25.png)
 
 
 

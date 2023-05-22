@@ -17,11 +17,10 @@ The codes rely on [Arduino](https://www.arduino.cc/) and [pyserial](https://gith
 ## Hardware :gear:
 Here are the different hardware equipment the 
 
-| Component|      Quantity      |  Price per unit | Example|  
-|----------|:-------------:|------:|------:|  
-| Arduino Uno |    1   |   24€ | [Robotshop](https://www.robotshop.com/eu/fr/microcontroleur-arduino-uno-r3-usb.html)|  
-| Light source controller | tested up to 5 || [Thorlabs](https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=2616) |  
-| Connection wires | 2$N_{sources}$| |  
+| Component | Quantity | Price per unit | Example |
+|----------|:-------------:|:-------------:|:-------------:|  
+| Arduino Uno | 1| 24€ | [Robotshop](https://www.robotshop.com/eu/fr/microcontroleur-arduino-uno-r3-usb.html)
+|  Light source controller | tested up to 5 | X| [Thorlabs](https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=2616) 
 
 ## Software :desktop_computer:
 
