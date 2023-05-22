@@ -15,13 +15,13 @@ It uses the library [pymmcore](https://github.com/micro-manager/pymmcore).
 [CSLcamera](CSLcamera/CSLcamera.py) can be used in the following way:
 
 ```
-from CSLcamera.CSLcamera import Camera
+from CSLcamera import ControlCamera
 cam_type = "MMConfig/Daheng.json"
 update_param = {"Exposure": 150*1000,
                  "Gain": 23}
 downscale = 5 #downscale the image to save 
 
-cam = Camera(cam_type, update_param, downscale)
+cam = ControlCamera(cam_type, update_param, downscale)
 
 snap_image, snap_video, continuous_stream = True, False, False
 if snap_image:
