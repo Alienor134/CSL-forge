@@ -101,6 +101,7 @@ if __name__ == "__main__":
     ## ARDUINO connection
     port_arduino = args.port
     LEDs = ControlLight(port_arduino)
+    LEDs.set_debug(True)
     time.sleep(2.0)
 
     blue_param = {'pin': 3,
