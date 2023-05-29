@@ -26,7 +26,7 @@ python setup.py develop
 ![im](Images/2023-04-07-18-32-25.png)
 
 To make sure the installation worked, go to (docs/blink)[docs/blink] and open the .ino file. Verify it and upload it on the Arduino by selecting the correct card and com port. Then, run 
-``` python blink.py --device=COM11 ```, you should see the LED in front of port 13 blink every second. 
+``` python blink.py --device=COMXX ``` (replace XX by the correct port number). You should see the LED in front of port 13 blink every second. 
 
 
 # How it works
