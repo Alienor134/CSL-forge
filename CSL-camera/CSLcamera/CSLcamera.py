@@ -162,7 +162,7 @@ class ControlCamera(threading.Thread):
 
 
     def save_video(self, save_folder,  _run=None):
-        result, timing = np.array(cam.video), np.array(cam.timing)
+        result, timing = np.array(self.video), np.array(self.timing)
         fname = save_folder + "/video.tiff"
         tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
                 
