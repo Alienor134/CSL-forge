@@ -129,7 +129,8 @@ class ControlCamera(threading.Thread):
       while True:
         if self.mmc.getRemainingImageCount() > 0:
           frame = self.mmc.popNextImage()
-          frame = np.mean(frame, axis = 2)
+          if len(frame.shape)==3:
+            frame = np.mean(frame, axis = 2)
           self.video.append(skimage.transform.downscale_local_mean(frame, self.downscale))
           self.timing.append(time.time())
           self.image = np.array(Image.fromarray(np.uint8(frame)))
