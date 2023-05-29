@@ -1,7 +1,7 @@
 # CSL-camera
 
 This repository explains how to control a camera with Python provided a .dll library exists to control it with Micro-Manager. 
-It uses the library [pymmcore](https://github.com/micro-manager/pymmcore).
+It uses the library [pymmcore-plus](https://github.com/pymmcore-plus/pymmcore-plus).
 
 
 **Prerequisites**:
@@ -47,7 +47,7 @@ python setup.py develop
 ## Control camera
 
 * If not done already: install micromanager  
-  * [Windows](https://micro-manager.org/Micro-Manager_Nightly_Builds)
+  * [Windows](https://micro-manager.org/Download_Micro-Manager_Latest_Release)
   * [Linux](https://micro-manager.org/Linux_installation_from_source_MM2)
   
 Plug the camera to the computer. 

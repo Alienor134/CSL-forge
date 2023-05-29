@@ -160,7 +160,7 @@ class ControlCamera(threading.Thread):
             raise ValueError("Invalid mode: {}".format(self.camera.mode))      
 
 
-    def save_video(self, _run, save_folder):
+    def save_video(self, save_folder,  _run=None):
         result, timing = np.array(cam.video), np.array(cam.timing)
         fname = save_folder + "/video.tiff"
         tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
@@ -175,9 +175,9 @@ class ControlCamera(threading.Thread):
         #    pickle.dump(result, f)
 
         #_run.add_artifact(fname, "video.npy")
-
-        _run.add_artifact(fname, "video.tiff")
-        _run.add_artifact(fname, "video_timing.csv")
+        if _run is not None:
+          _run.add_artifact(fname, "video.tiff")
+          _run.add_artifact(fname, "video_timing.csv")
         return result, timing
 
 if __name__== "__main__": 

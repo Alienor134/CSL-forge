@@ -6,6 +6,9 @@ install_requires = [
     'numpy',
     'pymmcore-plus',
     'opencv-python>=4.7.0',
+    'scikit-image',
+    'ipdb',
+    'pandas'
 ]
 
 
