@@ -2,7 +2,7 @@
 
 If you have developed for the Arduino before, you most likely have used the [Serial](https://docs.arduino.cc/built-in-examples/basics/AnalogReadSerial) class to print messages and to send commands for your computer to the Arduino.
 
-The Serial link has some caveats, though, and Romi Serial tries to address some of those. We  will go into detail further below. First, we show some examples on how to use it in your projects. We will show the classic "Blink" and  AnalogReadSerial" examples. In the first example
+The Serial link has some caveats, though, and  Romi Serial tries to address some of those. We  will go into detail further below. First, we show some examples on how to use it in your projects. We will show the classic "Blink" and  AnalogReadSerial" examples. In the first example
 we will control the LED from Python and C++. In the second example, we will se how to get data off the Arduino, in Python and C++.
 
 You can find the original code for Blink and AnalogReadSerial [online](https://docs.arduino.cc/built-in-examples) and also in the Arduino IDE in the menu `File` > `Examples` > `01.Basics`.
@@ -17,13 +17,17 @@ cd CSL-serial
 python setup.py develop
 ```
 
-1. Install [Arduino](https://www.arduino.cc/en/software)
+1. Install [Arduino IDE](https://www.arduino.cc/en/software)
 2. If you have never used an Arduino you can start with the [tutorial](https://www.arduino.cc/en/Guide/ArduinoUno).
 3. Find the location where Arduino fetches libraries (usually "Documents/Arduino/libraries on Windows"). Add "libraries" folder if it doesn't exist. 
 4. In this location, copy the [RomiSerial](XXXXX) folder of the repository. 
 
 
 ![im](Images/2023-04-07-18-32-25.png)
+
+To make sure the installation worked, go to (docs/blink)[docs/blink] and open the .ino file. Verify it and upload it on the Arduino by selecting the correct card and com port. Then, run 
+``` python blink.py --device=COM11 ```, you should see the LED in front of port 13 blink every second. 
+
 
 # How it works
 
@@ -39,13 +43,13 @@ sys.path.append('../python')
 
 import time
 import argparse
-from romi_device import RomiDevice
+from CSLserial import ControlSerial
 
 remoteDevice = False
 
 def setup(device):
     global remoteDevice
-    remoteDevice = RomiDevice(device)
+    remoteDevice = ControlSerial(device)
 
     
 def loop():
@@ -108,25 +112,22 @@ void handle_led(IRomiSerial *romiSerial, int16_t *args, const char *string_arg)
 
 We will go over the code above, step by step.
 
-The first two lines of the Python code make sure that you can run the
-example code from within the docs directory. If you installed the
-[romi_device.py](../python/romi_device.py) file in your code
-directory, you will not need this.
+The first two lines of the Python code make sure that you can run the example code from within the docs directory. If you installed the [CSLserial.py](CSLserial/CSLserial.py) file in your code directory, you will not need this.
 
 ```python
 import sys
 sys.path.append('../python')
 ```
 
-We will use a small utility class, called `RomiDevice`. It wraps the
+We will use a small utility class, called `ControlSerial`. It wraps the
 lower-level functions of sending and receiving commands, and handling
 errors.
 
 ```python
-from romi_device import RomiDevice
+from CSLserial import ControlSerial
 ```
 
-We will create one instance of a RomiDevice that we will store in a
+We will create one instance of a ControlSerial that we will store in a
 global variable for simplicity.
 
 ```python
@@ -144,7 +145,7 @@ will show below.
 ```python
 def setup(device):
     global remoteDevice
-    remoteDevice = RomiDevice(device)
+    remoteDevice = ControlSerial(device)
 ```
 
 If you want more debugging information, you can call
@@ -469,13 +470,13 @@ sys.path.append('../python')
 
 import time
 import argparse
-from romi_device import RomiDevice
+from CSLserial import ControlSerial
 
 remoteDevice = None
 
 def setup(device):
     global remoteDevice
-    remoteDevice = RomiDevice(device)
+    remoteDevice = ControlSerial(device)
 
     
 def loop():

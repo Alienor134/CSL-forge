@@ -3,13 +3,13 @@ sys.path.append('../python')
 
 import time
 import argparse
-from romi_device import RomiDevice
+from CSLserial import ControlSerial
 
 remoteDevice = None
 
 def setup(device):
     global remoteDevice
-    remoteDevice = RomiDevice(device)
+    remoteDevice = ControlSerial(device)
 
     
 def loop():
