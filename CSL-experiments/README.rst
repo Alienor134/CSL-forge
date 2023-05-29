@@ -10,17 +10,19 @@ The principle of Sacred is to store the experiment data and metadata in a file  
 #. Compare experiments: results/code difference/metadata difference
 
 
-## Install Sacred: 
+Install Sacred: 
+=================
 
+All the information about Sacred are here: `visit Sacred <https://github.com/IDSIA/sacred>`_
 
-All the information about Sacred are here: `visit Sacred <https://github.com/IDSIA/sacred>`_)
-
-## Install the database 
+Install the database 
+=================
 
 Download MongoDB [here](https://www.mongodb.com/try/download/community)
 Create a new database called "Sacred".
 
-## Web interface
+Web interface
+=================
 
 All the information about Omniboard are here: `visit Omniboard <https://github.com/vivekratnavel/omniboard>`_)
 
@@ -37,7 +39,8 @@ To open the interface connect to : http://localhost:9000/sacred
 ![](Images/2023-02-06-10-57-11.png)
 
 
-## Install the database quiery tool: 
+Install the database quiery tool: 
+=================
 
 All the information about Incense are here: `visit Incense <https://github.com/JarnoRFB/incense>`_)
 
@@ -118,26 +121,26 @@ Example of adaptation of [CSL-motors](XXX)
 Example of adaptation of [CSL-camera](XXX)
 -------
 
-+------------------------------------------------------------------+------------------------------------------------------------+
-| **Script to control a motor**                                    | **The same script as Sacred experiment**                   |
-+==================================================================+============================================================+
-| .. code:: python                                                 | .. code:: python                                           |
-|                                                                  |                                                            |
-| from CSLcamera import ControlCamera                              | from CSLcamera import ControlCamera                        |
-| cam_type = "MMConfig/Daheng.json"                                |                                                            |
-| update_param = {"Exposure": 150*1000,                            | @ex.config                                                 |
-|                  "Gain": 23}                                     | def config():                                              |
-| downscale = 5 #downscale the image to save                       |     cam_type = "MMConfig/Daheng.json"                      |
-| cam = ControlCamera(cam_type, update_param, downscale)N_im =  20 |     update_param = {"Exposure": 150*1000,                  |
-| cam.snap_video(N_im)video, timing = save_video("save_folder")    |                  "Gain": 23}                               |
-|                                                                  |     downscale = 5 #downscale the image to save             |
-|                                                                  |     N_im =  20                                             |
-|                                                                  | @ex.capture                                                |
-|                                                                  | def get_camera():                                          |
-|                                                                  |     cam = ControlCamera(cam_type, update_param, downscale) |
-|                                                                  |                                                            |
-|                                                                  | @ex.automain                                               |
-|                                                                  | def run(N_im):                                             |
-|                                                                  |     cam.snap_video(N_im)                                   |
-|                                                                  |     video, timing = save_video(save_folder, _run)          |
-+------------------------------------------------------------------+------------------------------------------------------------+
++---------------------------------------------------------------------+--------------------------------------------------------------+
+| **Script to control a motor**                                       | **The same script as Sacred experiment**                     |
++=====================================================================+==============================================================+
+| .. code:: python                                                    | .. code:: python                                             |
+|                                                                     |                                                              |
+|    from CSLcamera import ControlCamera                              |    from CSLcamera import ControlCamera                       |
+|    cam_type = "MMConfig/Daheng.json"                                |                                                              |
+|    update_param = {"Exposure": 150*1000,                            |    @ex.config                                                |
+|                  "Gain": 23}                                        |    def config():                                             |
+|    downscale = 5 #downscale the image to save                       |       cam_type = "MMConfig/Daheng.json"                      |
+|    cam = ControlCamera(cam_type, update_param, downscale)N_im =  20 |       update_param = {"Exposure": 150*1000,                  |
+|    cam.snap_video(N_im)                                             |                  "Gain": 23}                                 |
+|    video, timing = save_video("save_folder")                        |       downscale = 5 #downscale the image to save             |
+|                                                                     |       N_im =  20                                             |
+|                                                                     |    @ex.capture                                               |
+|                                                                     |    def get_camera():                                         |
+|                                                                     |       cam = ControlCamera(cam_type, update_param, downscale) |
+|                                                                     |                                                              |
+|                                                                     |    @ex.automain                                              |
+|                                                                     |    def run(N_im):                                            |
+|                                                                     |       cam.snap_video(N_im)                                   |
+|                                                                     |       video, timing = save_video(save_folder, _run)          |
++---------------------------------------------------------------------+--------------------------------------------------------------+
