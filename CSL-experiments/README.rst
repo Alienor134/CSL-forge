@@ -18,8 +18,8 @@ All the information about Sacred are here: `visit Sacred <https://github.com/IDS
 Install the database 
 =================
 
-Download MongoDB [here](https://www.mongodb.com/try/download/community)
-Create a new database called "Sacred".
+Download `MongoDB <https://www.mongodb.com/try/download/community>`_
+Create a new database called "sacred".
 
 Web interface
 =================
