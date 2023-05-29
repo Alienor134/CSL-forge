@@ -81,7 +81,7 @@ void loop()
 
 void send_info(RomiSerial *romiSerial, int16_t *args, const char *string_arg)
 {
-        romiSerial->send("[\"PAMFluo\",\"0.1\"]"); 
+        romiSerial->send("[\"LightControl\",\"0.1\"]"); 
 }
 
   

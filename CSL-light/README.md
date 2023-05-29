@@ -75,7 +75,7 @@ git clone XXXXXXXX
 
 1. Get the wiring to connect the Arduino to the light source controller. To begin, connect the wire to **pin 11**. 
 
-2. Open the [.ino](/ArduinoControl/LEDControl/LEDControl.ino) file.
+2. Open the [LEDControl/LEDControl.ino](LEDControl/LEDControl.ino) file.
 3. Select the Arduino board type in the "Tools/card type"
 <p align="center">
 <a> <img src="./Images/2023-04-07-18-41-01.png" width="500"></a>
@@ -93,14 +93,15 @@ git clone XXXXXXXX
 
 6. If no error appears you can click the arrow to load the code in the Arduino. 
  
-7. To test that you can properly interact with the Arduino, click on the magnifying glass in the upper right to open the serial monitor and type: "#?:xxxx" and ensure you get this output: 
+7. To test that you can properly interact with the Arduino, click on the magnifying glass in the upper right to open the serial monitor. Select **115200 baud** and **Both NL & CR** and type: "#?:xxxx" and ensure you get this output: 
  <p align="center">
 <a> <img src="./Images/2023-01-30-10-18-53.png" width="300"></a>
 </p>
 
 
-8. type: **#?:[11,0,0,2,0,1,0,0,255]**
-   You should see the LEDs blink (frequency 0.5Hz) 
+8. type: **#d[11,0,0,2,0,1,0,0,255]:xxxx**
+   You should see a character sequence appear. Then type **#b:xxxx** to start the experiment.
+   You should see the LEDs blink (frequency 0.5Hz). To stop the blinking, type **#e:xxxx**
 
 ## Install the library
 
