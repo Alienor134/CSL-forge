@@ -29,12 +29,8 @@ from CSLserial import ControlSerial
     
 class ControlLight():
     def __init__(self, arduino_port):
-        
         self.arduino_port = arduino_port
-
         self.arduino = ControlSerial(self.arduino_port)
-
-
 
 
     def add_digital_pulse(self, dic_param):
@@ -47,15 +43,20 @@ class ControlLight():
         secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
         analog_value = dic_param['analog_value']
 
-        offset_s = offset//1000
-        offset_ms = offset%1000
-        period_s = period//1000
-        period_ms = period%1000
-        duration_s = duration//1000
-        duration_ms = duration%1000
-        self.arduino.send_command("d[%d,%d,%d,%d,%d,%d,%d,%d,%d]" % (pin, offset_s, offset_ms, period_s,period_ms, duration_s,
-                                                        duration_ms, secondary, analog_value))
+        offset_s = int(offset // 1000)
+        offset_ms = int(offset % 1000)
+        period_s = int(period // 1000)
+        period_ms = int(period % 1000)
+        duration_s = int(duration // 1000)
+        duration_ms = int(duration % 1000)
+        
+        self.arduino.send_command("d[%d,%d,%d,%d,%d,%d,%d,%d,%d]"
+                                  % (pin, offset_s, offset_ms,
+                                     duration_s, duration_ms,
+                                     period_s,period_ms,
+                                     secondary, analog_value))
 
+        
     def add_primary_digital_pulse(self, dic_param): 
         """create a primary digital pulse function. When the primary is set to UP, all the secondary pulses are set to DOWN"""
 
@@ -66,20 +67,27 @@ class ControlLight():
         secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
         analog_value = dic_param['analog_value']
     
-        offset_s = offset//1000
-        offset_ms = offset%1000
-        period_s = period//1000
-        period_ms = period%1000
-        duration_s = duration//1000
-        duration_ms = duration%1000
-        self.arduino.send_command("m[%d,%d,%d,%d,%d,%d,%d,%d,%d]" % (pin, offset_s, offset_ms, period_s,period_ms, duration_s,
-                                                        duration_ms, secondary, analog_value))
+        offset_s = offset // 1000
+        offset_ms = offset % 1000
+        period_s = period // 1000
+        period_ms = period % 1000
+        duration_s = duration // 1000
+        duration_ms = duration % 1000
+        
+        self.arduino.send_command("m[%d,%d,%d,%d,%d,%d,%d,%d,%d]"
+                                  % (pin, offset_s, offset_ms,
+                                     duration_s, duration_ms,
+                                     period_s,period_ms,
+                                     secondary, analog_value))
 
 
-    def start_measurement(self):
+    def start_measurement(self, duration=0):
         """start the experiment"""
-        self.arduino.send_command("b")
+        sec = duration // 1000
+        ms = duration % 1000
+        self.arduino.send_command(f"b[{sec},{ms}]")
 
+        
     def stop_measurement(self):
         """stop the experiment"""
         self.arduino.send_command("e")
