@@ -28,26 +28,22 @@
 class DigitalPulse : public PeriodicActivity
 {
 public:
-        int8_t pin_;
-        //int32_t value_;
+        int value_;
         
-        DigitalPulse(int8_t pin, int32_t start_offset_ms, int32_t period,
-                     int32_t duration, uint8_t secondary/*, int32_t analog_value*/)
-                : PeriodicActivity(start_offset_ms, period, duration, secondary),
-                  pin_(pin)//,
-                  /*value_(analog_value)*/ {
+        DigitalPulse(int8_t pin, int32_t start_offset, int32_t period,
+                     int32_t duration, int analog_value)
+                : PeriodicActivity(pin, start_offset, period, duration),
+                  value_(analog_value) {
                 pinMode(pin_, OUTPUT);                
         }
 
         void on() override {
-                //analogWrite(pin_, value_);
-                digitalWrite(pin_, HIGH);
+                analogWrite(pin_, value_);
                 on_ = true;
         }
         
         void off() override {
-                //analogWrite(pin_, 0);
-                digitalWrite(pin_, LOW);
+                analogWrite(pin_, 0);
                 on_ = false;
         }
 };

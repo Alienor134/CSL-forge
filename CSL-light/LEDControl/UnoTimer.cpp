@@ -67,6 +67,11 @@ void UnoTimer::stop()
         activities_ = nullptr;
 }
 
+bool UnoTimer::isActive()
+{
+        return running_;
+}
+
 // FIXME
 static void start_activities()
 {
@@ -87,7 +92,12 @@ static void stop_activities()
 static inline void update_activities(int32_t ms)
 {
         for (int i = 0; i < num_activities_; i++) {
-                activities_[i]->update(ms);
+                if (!activities_[i]->isSecondary())
+                        activities_[i]->update(ms);
+        }
+        for (int i = 0; i < num_activities_; i++) {
+                if (activities_[i]->isSecondary())
+                        activities_[i]->update(ms);
         }
 }
 

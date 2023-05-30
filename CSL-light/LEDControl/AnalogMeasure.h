@@ -28,15 +28,12 @@
 class AnalogMeasure : public PeriodicActivity
 {
 public:
-        int8_t pin;
         uint16_t values_[256];
         uint16_t current_index_;
         uint16_t max_index_;
         
-        AnalogMeasure(int8_t pin_, int32_t start_offset_ms, int32_t period,
-                      int32_t duration, uint8_t secondary)
-                : PeriodicActivity(start_offset_ms, period, duration, secondary),
-                  pin(pin_) {
+        AnalogMeasure(int8_t pin, int32_t start_offset_ms, int32_t period, int32_t duration)
+                : PeriodicActivity(pin, start_offset_ms, period, duration) {
                 max_index_ = duration;
                 if (max_index_ > 256)
                         max_index_ = 256;
@@ -67,7 +64,7 @@ public:
 
         void measure() {
                 if (current_index_ < max_index_) {
-                        values_[current_index_++] = analogRead(pin);
+                        values_[current_index_++] = analogRead(pin_);
                 }
         }
 };

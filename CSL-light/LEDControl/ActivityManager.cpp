@@ -21,91 +21,63 @@
  */
 
 #include "Arduino.h"
-#include "AnalogMeasure.h"
-#include "DigitalPulse.h"
-#include "PrimaryDigitalPulse.h"
 #include "ActivityManager.h"
 
-ActivityManager::ActivityManager() : current_number_activities(0)
+ActivityManager::ActivityManager() : number_activities_(0)
 {
-        for (uint8_t index = 0; index < MAX_ACTIVITIES; index++) {
-                activities[index] = nullptr;
+        for (uint8_t index = 0; index < kMaxActivities; index++) {
+                activities_[index] = nullptr;
         }
 }
 
 ActivityManager::~ActivityManager()
 {
-        for (uint8_t index = 0; index < current_number_activities; index++) {
-                delete activities[index];
-                activities[index] = nullptr;
+        clear();
+}
+
+void ActivityManager::clear()
+{
+        for (uint8_t index = 0; index < number_activities_; index++) {
+                delete activities_[index];
+                activities_[index] = nullptr;
         }
+        number_activities_ = 0;
 }
 
 bool ActivityManager::addActivity(IActivity *newactivity)
 {
         bool retval = false;
-        if (newactivity != nullptr) {
-                activities[current_number_activities++] = newactivity;
+        if (newactivity != nullptr
+            && number_activities_ < kMaxActivities){
+                activities_[number_activities_++] = newactivity;
                 retval = true;
-        }
-        return retval;
-}
-
-bool ActivityManager::addDigitalPulse(int8_t pin, int32_t start_delay_ms,
-                                      int32_t duration, int32_t period,
-                                      int8_t secondary// , int32_t analog_value
-        )
-{
-        bool retval = false;
-
-        if (current_number_activities < MAX_ACTIVITIES) {
-                auto newactivity = new DigitalPulse(pin, start_delay_ms, period, duration,
-                                                    secondary
-                                                    /*, analog_value*/);
-                retval = addActivity(newactivity);
-        }
-        return retval;
-}
-
-bool ActivityManager::addPrimaryDigitalPulse(int8_t pin, int32_t start_delay_ms,
-                                             int32_t duration, int32_t period,
-                                             int8_t secondary/*, int32_t analog_value*/)
-{
-        bool retval = false;
-        int8_t current_number_secondarys = 0;
-        if (current_number_activities < MAX_ACTIVITIES) {
-                auto newactivity = new PrimaryDigitalPulse(pin, start_delay_ms, period,
-                                                           duration, secondary
-                                                           /*,analog_value*/);
-                retval = addActivity(newactivity);
-                for (int i = 0; i < current_number_activities;  i++) {
-                        if (activities[i]->isSecondary()) {
-                                newactivity->addSecondary(activities[i]);
-                        }
-                }        
-        }
-        return retval;
-}
-
-bool ActivityManager::addAnalogueMeasure(int8_t pin, int32_t start_delay_ms,
-                                         int32_t duration, int32_t period,
-                                         int8_t secondary)
-{
-        bool retval = false;
-        if (current_number_activities < MAX_ACTIVITIES){
-                auto newactivity = new AnalogMeasure(pin, start_delay_ms, duration,
-                                                     period, secondary);
-                retval = addActivity(newactivity);
         }
         return retval;
 }
 
 IActivity **ActivityManager::getActivities()
 {
-        return activities;
+        return activities_;
 }
 
 uint8_t ActivityManager::countActivities()
 {
-        return current_number_activities;
+        return number_activities_;
+}
+
+uint8_t ActivityManager::availableSpace()
+{
+        return kMaxActivities - number_activities_;
+}
+
+IActivity *ActivityManager::getActivityOnPin(uint8_t pin)
+{
+        IActivity *activity = nullptr;
+        for (uint8_t index = 0; index < number_activities_; index++) {
+                if (activities_[index]->getPin() == pin) {
+                        activity = activities_[index];
+                        break;
+                }
+        }
+        return activity;
 }

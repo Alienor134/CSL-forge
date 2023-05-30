@@ -12,6 +12,7 @@ public:
         void init() override;
         void start(IActivity **a, int n) override;
         void stop() override;
+        bool isActive() override;
 };
         
 #endif // __UnoTimer_h

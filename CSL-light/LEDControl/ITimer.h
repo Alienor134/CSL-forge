@@ -11,6 +11,7 @@ public:
         virtual void init() = 0;
         virtual void start(IActivity **a, int n) = 0;
         virtual void stop() = 0;
+        virtual bool isActive() = 0;
 };
         
 #endif // __ITimer_h

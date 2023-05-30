@@ -23,34 +23,9 @@
 #ifndef __PeriodicActivity_h
 #define __PeriodicActivity_h
 
-#include "IActivity.h"
+#include "BaseActivity.h"
 
-// For testing without arduino.
-//#define OUTPUT 0
-//#define HIGH 0
-//#define LOW 1
-//
-//static void pinMode(uint16_t pin, uint16_t fn)
-//{
-//}
-//
-//static void digitalWrite(uint16_t pin, uint16_t fn)
-//{
-//}
-//
-//static uint16_t analogRead(uint16_t pin)
-//{
-//    return pin;
-//}
-
-enum SecondaryType
-{
-        kNo = 0,
-        kAligned = 1,
-        kInverted = 2
-};
-
-class PeriodicActivity : public IActivity
+class PeriodicActivity : public BaseActivity
 {
 public:
         
@@ -60,38 +35,27 @@ protected:
         int32_t duration_;
         int32_t duration_on_;
         int32_t duration_off_;
-        uint8_t secondary_;
-        bool on_;
         int32_t next_event_;
+        bool should_be_on_;
         
 public:
 
-        PeriodicActivity(int32_t start_offset_ms, int32_t period,
-                         int32_t duration, uint8_t secondary)
-                : offset_(start_offset_ms),
+        PeriodicActivity(int8_t pin, int32_t start_offset_ms,
+                         int32_t period, int32_t duration)
+                : BaseActivity(pin),
+                  offset_(start_offset_ms),
                   period_(period),
                   duration_(duration),
-                  secondary_(secondary),
-                  on_(false) {
+                  should_be_on_(false) {
                 next_event_ = offset_;
                 duration_on_ = duration;
                 duration_off_ = period_ - duration;
-                
-                // SerialUSB.print("init: offset ");
-                // SerialUSB.print(offset_);
-                // SerialUSB.print(" period ");
-                // SerialUSB.print(period_);
-                // SerialUSB.print(" duration_on ");
-                // SerialUSB.print(duration_on_);
-                // SerialUSB.print(" duration_off ");
-                // SerialUSB.print(duration_off_);
-                // SerialUSB.print(" next ");
-                // SerialUSB.println(next_event_);
         }
         
         virtual ~PeriodicActivity() = default;
-
+        
         void start() override {
+                next_event_ = offset_;
                 if (duration_off_ == 0) {
                         on();
                         next_event_ = 0x7fffffff;
@@ -101,26 +65,31 @@ public:
                 }
         }
         
-        void stop() override {}
-
-        bool isOn() {
-                return on_;
-        }
-
-        uint8_t isSecondary() {
-                return secondary_;
+        void stop() override {
+                off();
         }
 
         void update(int32_t ms) {
                 if (ms >= next_event_) {
-                        on_ = !on_;
-                        if (on_ == false) {
-                                off();
-                                next_event_ += duration_off_;
-                        } else {
-                                on();
+                        should_be_on_ = !should_be_on_;
+                        if (should_be_on_) {
                                 next_event_ += duration_on_;
+                        } else {
+                                next_event_ += duration_off_;
                         }
+                }
+                if (primary_ == nullptr) {
+                        if (!on_ && should_be_on_)
+                                on();
+                        if (on_ && !should_be_on_)
+                                off();
+                } else {
+                        if (!on_ && should_be_on_ && !primary_->isOn())
+                                on();
+                        else if (on_ && primary_->isOn())
+                                off();
+                        else if (on_ && !should_be_on_)
+                                off();
                 }
         }
 };

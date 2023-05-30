@@ -13,15 +13,15 @@ protected:
         bool done_;
         
 public:
-        EndSwitch()
-                : end_(0x7ffffff),
+        EndSwitch(int32_t end)
+                : end_(end),
                   done_(false) {
         }
         
         ~EndSwitch() override = default;
 
-        void setDuration(int32_t end) {
-                end_ = end;
+        uint8_t getPin() override {
+                return 0xff;
         }
         
         void start() override {
@@ -55,8 +55,12 @@ public:
                 return done_;
         }
         
-        uint8_t isSecondary() {
-                return 0;
+        bool isSecondary() {
+                return false;
+        }
+        
+        void setPrimary(IActivity *activity) {
+                // pass
         }
 };
 
