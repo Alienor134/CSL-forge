@@ -23,7 +23,6 @@
 #include <RomiSerial.h>
 #include <RomiSerialErrors.h>
 #include <stdint.h>
-#include "AnalogMeasure.h"
 #include "DigitalPulse.h"
 #include "ActivityManager.h"
 #include "BoardFactory.h"
@@ -35,8 +34,6 @@
 using namespace romiserial;
 
 void send_info(IRomiSerial *romiSerial, int16_t *args, const char *string_arg);
-void handle_add_analogue_measure(IRomiSerial *romiSerial, int16_t *args,
-                                 const char *string_arg);
 void handle_add_digital_pulse(IRomiSerial *romiSerial, int16_t *args,
                               const char *string_arg);
 void handle_set_secondary(IRomiSerial *romiSerial, int16_t *args, const char *string_arg);
@@ -49,7 +46,6 @@ void handle_is_active(IRomiSerial *romiSerial, int16_t *args, const char *string
 void handle_reset(IRomiSerial *romiSerial, int16_t *args, const char *string_arg);
 
 const static MessageHandler handlers[] = {
-        { 'a', 7, false, handle_add_analogue_measure },
         { 'd', 8, false, handle_add_digital_pulse },
         { 'r', 1, false, handle_add_relay },
         { 's', 2, false, handle_set_secondary },
@@ -112,29 +108,6 @@ void loop()
 void send_info(IRomiSerial *romiSerial, int16_t *args, const char *string_arg)
 {
         romiSerial->send("[\"LightControl\",\"0.1\"]"); 
-}
-  
-void handle_add_analogue_measure(IRomiSerial *romiSerial, int16_t *args,
-                                 const char *string_arg)
-{        
-        int8_t pin = (uint8_t) args[0];
-        int32_t start_delay = (int32_t) args[1] * 1000 + args[2];
-        int32_t duration = (int32_t) args[3] * 1000 + args[4];
-        int32_t period = (int32_t) args[5] * 1000 + args[6];
-
-        if (start_delay < 0)
-                romiSerial->send_error(kBadStartCode, kBadStartMessage);
-        else if (period <= 0)
-                romiSerial->send_error(kBadPeriodCode, kBadPeriodMessage);
-        else if (duration < 0 || duration > period)
-                romiSerial->send_error(kBadDurationCode, kBadDurationMessage);
-        else if (activityManager.availableSpace() == 0) 
-                romiSerial->send_error(kMaxActivitiesCode, kMaxActivitiesMessage);
-        else {
-                auto activity = new AnalogMeasure(pin, start_delay, duration, period);
-                activityManager.addActivity(activity);
-                romiSerial->send_ok();
-        }
 }
 
 void handle_add_digital_pulse(IRomiSerial *romiSerial, int16_t *args,

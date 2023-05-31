@@ -132,10 +132,6 @@ if __name__ == "__main__":
 
                  
     LEDs.add_digital_pulse(blue_param)
-    LEDs.add_primary_digital_pulse(purple_param)
-
-    LEDs.start_measurement()
-
-    time.sleep(30)
-
-    LEDs.stop_measurement()
+    LEDs.add_digital_pulse(purple_param)
+    LEDs.set_secondary(purple_param, blue_param)
+    LEDs.start_measurement(30*s)
