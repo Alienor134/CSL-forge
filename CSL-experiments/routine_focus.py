@@ -19,20 +19,14 @@
   <http://www.gnu.org/licenses/>.
   
 """
-
-import time
-
+import os
+csl_path = os.environ['CSL_PATH']
 
 import threading
-import time
-import matplotlib.pyplot as plt
 import tempfile
 import ipdb
-import cv2
 import imageio
 
-
-import time as TIMING
 
 
 from serial import *
@@ -74,7 +68,7 @@ def cfg(arduino_LED):
 @ex.named_config
 def Daheng():
     
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/Daheng.json" #"MMconfig/UEye.json"    cam_param =  {"TriggerMode": "Off",
     cam_param = { 
         "SensorHeight":2048,
         "SensorWidth":2448,
@@ -87,7 +81,7 @@ def Daheng():
 @ex.named_config
 def UEye():
 
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Trigger":"internal",
         "Exposure": 97,
                  "Gain": 100}

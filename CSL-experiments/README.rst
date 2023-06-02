@@ -19,7 +19,7 @@ Install the database
 =================
 
 Download `MongoDB <https://www.mongodb.com/try/download/community>`_
-Create a new database called "sacred".
+Create a new database called "sacred" (no caps).
 
 Web interface
 =================

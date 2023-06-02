@@ -35,6 +35,9 @@ import ipdb
 import copy
 import pandas as pd
 import tifffile
+import os
+
+csl_path = os.environ['CSL_PATH']
 
 
 
@@ -61,7 +64,7 @@ class ControlCamera(threading.Thread):
       self.mmc = pymmcore_plus.CMMCorePlus()
       self.mmc.getCameraDevice()
       self.mmc.setDeviceAdapterSearchPaths([mm_dir])
-      self.mmc.loadSystemConfiguration(config["MMconfig"])
+      self.mmc.loadSystemConfiguration(csl_path + "/" + config["MMconfig"])
 
 
 
@@ -187,15 +190,15 @@ if __name__== "__main__":
 
   """ DAHENG """
   cam_param = {"TriggerSource": "Software"}
-  cam = ControlCamera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
+  cam = ControlCamera(csl_path + "/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
 
   """ UEYE """
   #cam_param = {"Trigger": "internal"}
-  #cam = Camera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json", cam_param)
+  #cam = Camera(csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json", cam_param)
 
   """ ANDOR """
   #cam_param = {}
-  #cam = Camera("C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Andor.json", cam_param)
+  #cam = Camera(csl_path + "/CSL-forge/CSL-camera/MMConfig/Andor.json", cam_param)
 
   """ Acquisition """
 

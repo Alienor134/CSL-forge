@@ -27,6 +27,10 @@ import os
 import datetime
 import ipdb
 
+import os
+
+csl_path = os.environ['CSL_PATH']
+
 
 save_folder = Ingredient('save_folder')
 
@@ -51,7 +55,7 @@ def cfg():
 
 @save_folder.capture
 def make_folder(_run):
-    folder = "C:/Users/alien/Documents/Github/CSL-forge/Experiments/" + str(_run._id) + "_" + str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_')) + _run.experiment_info["name"]
+    folder = csl_path + "/CSL-forge/Experiments/" + str(_run._id) + "_" + str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_')) + _run.experiment_info["name"]
     
     os.mkdir(folder)
     with open(folder + '/config.json', 'w') as fp:

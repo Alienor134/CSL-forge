@@ -19,22 +19,14 @@
   <http://www.gnu.org/licenses/>.
   
 """
+import os
+csl_path = os.environ['CSL_PATH']
 
-import time
-import json
-import argparse
-import pickle
 
-import pandas as pd
-import pymmcore
+
 import os.path
-import time
 import numpy as np
-import cv2
-from PIL import Image
-import matplotlib.pyplot as plt
-import tempfile
-import ipdb
+
 
 from serial import *
 
@@ -84,7 +76,7 @@ def cfg(arduino_LED):
 
 @ex.named_config
 def Daheng():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/Daheng.json"
 
     cam_param = {"Exposure": 150*1000,
                  "Gain": 23,
@@ -95,7 +87,7 @@ def Daheng():
 
 @ex.config
 def UEye():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
                 "Exposure": 170,
                  "Gain": 100}

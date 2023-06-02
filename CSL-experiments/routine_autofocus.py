@@ -20,20 +20,16 @@
   
 """
 
-import time
-import json
-import argparse
-import pickle
 
-import pymmcore
+
+import os
+csl_path = os.environ['CSL_PATH']
+
 import os.path
-import time
 import numpy as np
 import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
-import tempfile
-import tifffile as tiff
 import ipdb
 
 import time as TIMING
@@ -85,7 +81,7 @@ def cfg(arduino_LED):
 
 @ex.named_config
 def Daheng():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/Daheng.json"
 
     cam_param = {"Exposure": 900*1000,
                  "Gain": 10,
@@ -96,7 +92,7 @@ def Daheng():
 
 @ex.config
 def UEye():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
                 "Exposure": 900,
                  "Gain": 100, 
