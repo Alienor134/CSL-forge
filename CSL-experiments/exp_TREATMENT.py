@@ -39,9 +39,9 @@ import ipdb
 import tifffile
 from serial import *
 
-from ingredient_csl_leds import arduino_LED, add_primary_digital_pulse, add_digital_pulse, start_measurement, stop_measurement, create_link
+from ingredient_csl_leds import arduino_LED, get_arduino_light
 from ingredient_save_folder import save_folder, make_folder
-from CSLcamera.CSLcamera import Camera
+from CSLcamera import ControlCamera
 
 
 from sacred.observers import MongoObserver
@@ -60,16 +60,8 @@ def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["secondary"] = 1
     
 
-    purple_param["offset"] = 250*sec + 10*sec
-    purple_param["period"] = 20*sec
-    purple_param["duration"] = 200 #ms
-    purple_param["analog_value"] = 190
-    purple_param["secondary"] = 0
-
-    
-    
     trigger_param["offset"] = 15
-    trigger_param["period"] = 1*sec
+    trigger_param["period"] = 60*sec
 
 
 ex = Experiment('NPQ_leaf', ingredients=[arduino_LED, save_folder ])
@@ -98,7 +90,7 @@ def Daheng():
 @ex.config
 def UEye():
 
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = "D:/github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
                 "Exposure": 997,
                  "Gain": 100}
@@ -114,21 +106,20 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     save_folder =  make_folder(_run)
     ### initialize devices
     ##ARDUINO
-    link = create_link(arduino_LED['port_arduino'])
 
-    cam = Camera(cam_type, cam_param, downscale)
+    arduino_light = get_arduino_light(arduino_LED['port_arduino'])
+
+    cam = ControlCamera(cam_type, cam_param, downscale)
     #cam.camera_mode = "snap_video"
     #cam.N_im = framerate*exp_duration
 
     
     #camera trigger
-    add_digital_pulse(link,  arduino_LED['trigger_param'])
+    arduino_light.add_digital_pulse(arduino_LED['trigger_param'])
 
     #blue LED
-    add_digital_pulse(link,  arduino_LED['blue_param'])
+    arduino_light.add_digital_pulse(arduino_LED['blue_param'])
 
-    #purple LED
-    add_primary_digital_pulse(link,  arduino_LED['purple_param'])
 
 
 
@@ -138,10 +129,10 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
 
     #cam.start()
     
-    start_measurement(link)
+    arduino_light.start_measurement()
 
     cam.snap_video(framerate*exp_duration)
-    stop_measurement(link)
+    arduino_light.stop_measurement()
     #cam.join()
 
     result, timing = np.array(cam.video), np.array(cam.timing)

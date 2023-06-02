@@ -52,14 +52,14 @@ min = 60*1000
 @arduino_LED.config
 def update_cfg(blue_param, purple_param, trigger_param):
 
-    blue_param["offset"] = 0*250*sec + 20*sec
+    blue_param["offset"] = 1*250*sec + 20*sec
     blue_param["period"] = 30*min
     blue_param["duration"] = 15*min
-    blue_param["analog_value"] = 255//5
+    blue_param["analog_value"] = 255//4
     blue_param["secondary"] = 1
     
 
-    purple_param["offset"] = 0*250*sec + 10*sec
+    purple_param["offset"] = 1*250*sec + 10*sec
     purple_param["period"] = 20*sec
     purple_param["duration"] = 200 #ms
     purple_param["analog_value"] = 190
@@ -84,7 +84,7 @@ def cfg(arduino_LED):
 
 @ex.named_config
 def Daheng():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
+    cam_type = "D:/github/CSL-forge/CSL-camera/MMConfig/Daheng.json"
 
     cam_param = {"Exposure": 150*1000,
                  "Gain": 23,
@@ -95,7 +95,7 @@ def Daheng():
 
 @ex.config
 def UEye():
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = "D:/github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
                 "Exposure": 170,
                  "Gain": 100}
@@ -141,7 +141,7 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     arduino_light.stop_measurement()
     #cam.join()
 
-    result, timing = cam.save_video(_run)
+    result, timing = cam.save_video(save_folder, _run)
 
     for i, frame in enumerate(result):
         _run.log_scalar("Fluorescence", np.mean(frame), i)

@@ -68,7 +68,7 @@ def cfg(arduino_LED):
     z = 0
     gears = [1, 100, 1]
 
-    arduino_motors = "COM6"
+    arduino_motors = "COM7"
 
 
 @ex.named_config
@@ -87,9 +87,9 @@ def Daheng():
 @ex.named_config
 def UEye():
 
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = "D:/github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Trigger":"internal",
-        "Exposure": 97,
+        "Exposure": 397,
                  "Gain": 100}
     
 

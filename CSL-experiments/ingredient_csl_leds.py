@@ -37,7 +37,7 @@ arduino_LED = Ingredient('arduino_LED')
 @arduino_LED.config
 def cfg():
 
-    port_arduino = "COM5"
+    port_arduino = "COM8"
 
     blue_param = {'pin': 3,
             'offset': 500, #ms

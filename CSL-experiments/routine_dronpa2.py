@@ -56,8 +56,12 @@ def update_cfg(blue_param, purple_param, trigger_param):
     blue_param["offset"] = 5*sec
     blue_param["period"] = 10*min
     blue_param["duration"] = 10*min
-    blue_param["analog_value"] = 255//5
+    blue_param["analog_value"] = 255//4
     
+    purple_param["offset"] = 5*sec
+    purple_param["period"] = 10*min
+    purple_param["duration"] = 10*min
+    purple_param["analog_value"] = 255
     
     
     trigger_param["offset"] = 3*sec
@@ -90,9 +94,9 @@ def Daheng():
 @ex.named_config
 def UEye():
 
-    cam_type = "C:/Users/alien/Documents/Github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
+    cam_type = "D:/github/CSL-forge/CSL-camera/MMConfig/UEye.json" 
     cam_param = {"Frame Rate":1,
-                "Exposure": 997,
+                "Exposure": 900,
                  "Gain": 100}
 
 #@ex.capture()
@@ -113,7 +117,7 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     #cam.N_im = framerate*exp_duration
 
     #blue LED
-    arduino_light.add_digital_pulse(arduino_LED['blue_param'])
+    arduino_light.add_digital_pulse(arduino_LED['purple_param'])
 
     #camera trigger
     arduino_light.add_digital_pulse(arduino_LED['trigger_param'])
@@ -131,6 +135,9 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     #cam.join()
 
     result, timing = np.array(cam.video), np.array(cam.timing)
+
+    ipdb.set_trace()
+
     fname = save_folder + "/video.tiff"
     tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
             
@@ -144,6 +151,8 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     #    pickle.dump(result, f)
 
     #_run.add_artifact(fname, "video.npy")
+
+
 
     _run.add_artifact(fname, "video.tiff")
     _run.add_artifact(fname, "video_timing.csv")
