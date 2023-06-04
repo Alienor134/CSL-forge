@@ -129,9 +129,24 @@ Now test again:
 
 ```python Camera.py```
 
+### Documentation
+You can import the class Camera.py for modular usage of the library.
 
+**ControlCamera** class: This class represents a control interface for a camera. It inherits from the threading.Thread class and provides methods for controlling the camera, capturing images, and recording videos.
 
-**You can import the class Camera.py for modular usage of the library.**
+Methods of ControlCamera class:
+
+  - **__init__**: Initializes the ControlCamera object by loading the configuration from a JSON file, setting camera parameters, and initializing the Micro-Manager Core.
+  - **clip_im**: Clips the input image based on the specified minimum and maximum quantiles.
+  - **update_param**: Updates a camera parameter with the specified key to the given value.
+  - **get_param**: Retrieves the current value of a camera parameter with the specified key.
+  - **continuous_stream**: Performs continuous streaming of camera frames and displays them in a window.
+  - **reset**: Resets the camera.
+  - **snap_image**: Captures a single image from the camera.
+  - **snap_video**: Captures a video with the specified number of frames.
+  - **run**: Runs the camera based on the specified camera mode.
+  - **save_video**: Saves the captured video frames to a folder and logs the timing information.
+
 
 ### License
 

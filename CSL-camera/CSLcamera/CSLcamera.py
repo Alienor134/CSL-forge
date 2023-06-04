@@ -42,6 +42,17 @@ csl_path = os.environ['CSL_PATH']
 
 
 def clip(input_image, high = 99.99, low = 0.001):
+    """
+    Clip the input image based on the specified high and low percentiles.
+
+    Args:
+        input_image (numpy.ndarray): The input image.
+        high (float): The high percentile value for clipping (default: 99.99).
+        low (float): The low percentile value for clipping (default: 0.001).
+
+    Returns:
+        numpy.ndarray: The clipped image.
+    """
     im = copy.copy(input_image)
     im[im<np.percentile(im, low)]=np.percentile(im, low)
     im[im>np.percentile(im, high)]=np.percentile(im, high)
@@ -50,10 +61,26 @@ def clip(input_image, high = 99.99, low = 0.001):
 
 
 class ControlCamera(threading.Thread):
+
+
     def __init__(self, config_file, cam_param, downscale=3, mm_dir = "C:/Program Files/Micro-Manager-2.0/"):
+      """
+      Initialize the ControlCamera object.
+
+      Args:
+          config_file (str): The path to the configuration file in JSON format.
+          cam_param (dict): Additional camera parameters specified as key-value pairs.
+          downscale (int): Downscale factor for video acquisition (default: 3).
+          mm_dir (str): The path to the Micro-Manager installation directory (default: "C:/Program Files/Micro-Manager-2.0/").
+      """
       threading.Thread.__init__(self)
-      f = open(config_file)
-      config = json.load(f)
+      try:
+        f = open(config_file)
+        config = json.load(f)
+      except FileNotFoundError:
+          print(f"Config file '{config_file}' not found.")
+          raise
+      
       self.name = config["name"]
       self.video = []
       self.timing = []
@@ -64,8 +91,10 @@ class ControlCamera(threading.Thread):
       self.mmc = pymmcore_plus.CMMCorePlus()
       self.mmc.getCameraDevice()
       self.mmc.setDeviceAdapterSearchPaths([mm_dir])
-      self.mmc.loadSystemConfiguration(csl_path + "/" + config["MMconfig"])
-
+      try:
+        self.mmc.loadSystemConfiguration(csl_path + "/" + config["MMconfig"])
+      except:
+         print("Error accessing the camera with pymmcore-plus (interface with MicroManager). Consider checking that the camera driver is installed and that the .dll is known by MicroManager")
 
 
       
@@ -78,26 +107,43 @@ class ControlCamera(threading.Thread):
       for key in cam_param:
           self.mmc.setProperty(self.name, key, cam_param[key])
 
-    def clip_im(self, im, mini = 0.1, maxi = 0.9):
-      image = np.copy(im)
-      Q1 = np.quantile(image, mini)
-      Q3 = np.quantile(image, maxi)
-
-      image[image<Q1]=Q1
-      image[image<Q3]=Q3
-      return image
-
-       
+      
 
     def update_param(self, key, val):
-        self.mmc.setProperty(self.name, key, val)
+        """
+        Update the camera parameter with the specified key to the given value.
+
+        Args:
+            key (str): The camera parameter key.
+            val: The value to set for the camera parameter.
+        """
+        try:
+            self.mmc.setProperty(self.name, key, val)
+        except Exception as e:
+            print(f"Failed to update parameter '{key}' with value '{val}': {e}")
 
     def get_param(self, key):
-        return self.mmc.getProperty(self.name, key)
+        """
+        Get the current value of the camera parameter with the specified key.
 
+        Args:
+            key (str): The camera parameter key.
+
+        Returns:
+            The current value of the camera parameter.
+        """
+    def get_param(self, key):
+        try:
+            return self.mmc.getProperty(self.name, key)
+        except Exception as e:
+            print(f"Failed to retrieve parameter '{key}': {e}")
+            return None
 
 
     def continuous_stream(self):
+      """
+      Perform continuous streaming of the camera frames and display them in a window.
+      """
       cv2.namedWindow('live',cv2.WINDOW_NORMAL)
       self.mmc.startContinuousSequenceAcquisition(1)
       while True:
@@ -118,12 +164,29 @@ class ControlCamera(threading.Thread):
        self.mmc.reset()
 
     def snap_image(self):
-        self.mmc.snapImage()
-        self.frame = self.mmc.getImage()
-        #image = np.array(Image.fromarray(np.uint8(frame)))
+        """
+        Capture a single image from the camera.
 
+        Returns:
+            numpy.ndarray: The captured image.
+        """
+        try:
+            self.mmc.snapImage()
+            self.frame = self.mmc.getImage()
+            # image = np.array(Image.fromarray(np.uint8(frame)))
+        except Exception as e:
+            print(f"Failed to snap image: {e}")
 
     def snap_video(self, N_im): 
+      """
+      Capture a video with the specified number of frames.
+
+      Args:
+          N_im (int): The number of frames to capture.
+
+      Returns:
+          numpy.ndarray: The captured video frames.
+        """
       self.video = []
       self.timing = []
       cv2.namedWindow('live',cv2.WINDOW_AUTOSIZE)
@@ -155,6 +218,9 @@ class ControlCamera(threading.Thread):
 
 
     def run(self):
+        """
+        Run the camera based on the specified camera mode. Useful for threads.
+        """
         # call the appropriate method based on a flag or some other logic
         if self.camera_mode == 'continuous_stream':
             self.continuous_stream()
@@ -165,6 +231,18 @@ class ControlCamera(threading.Thread):
 
 
     def save_video(self, save_folder,  _run=None):
+        """
+        Save the captured video frames to the specified folder and log the timing information.
+
+        Args:
+            save_folder (str): The path to the folder where the video and timing files will be saved.
+            _run (object): The object representing the current run in the experiment logging framework (default: None).
+
+        Returns:
+            numpy.ndarray: The captured video frames.
+            numpy.ndarray: The timing information for each frame.
+        """        
+    
         result, timing = np.array(self.video), np.array(self.timing)
         fname = save_folder + "/video.tiff"
         tifffile.imwrite(fname, result[:,:,:],photometric="minisblack")
