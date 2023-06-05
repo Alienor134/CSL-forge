@@ -80,7 +80,7 @@ ex.observers.append(MongoObserver())
 def cfg(arduino_LED):
         framerate = 1000/arduino_LED['trigger_param']['period']
         exp_duration = 250 + 30*60
-        downscale = 10
+        downscale = 3
 
 @ex.named_config
 def Daheng():
@@ -141,7 +141,7 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     arduino_light.stop_measurement()
     #cam.join()
 
-    result, timing = cam.save_video(save_folder, _run)
+    result, timing = cam.save_video(save_folder)
 
     for i, frame in enumerate(result):
         _run.log_scalar("Fluorescence", np.mean(frame), i)
