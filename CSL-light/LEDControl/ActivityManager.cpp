@@ -23,94 +23,61 @@
 #include "Arduino.h"
 #include "ActivityManager.h"
 
-ActivityManager::ActivityManager() : current_number_activities(0)
+ActivityManager::ActivityManager() : number_activities_(0)
 {
-    for (uint8_t index = 0; index < MAX_ACTIVITIES; index++)
-    {
-        activities[index] = nullptr;
-    }
+        for (uint8_t index = 0; index < kMaxActivities; index++) {
+                activities_[index] = nullptr;
+        }
 }
 
 ActivityManager::~ActivityManager()
 {
-    for (uint8_t index = 0; index < current_number_activities; index++)
-    {
-        delete activities[index];
-        activities[index] = nullptr;
-    }
+        clear();
 }
 
-bool ActivityManager::AddActivity(PeriodicActivity *newactivity)
+void ActivityManager::clear()
 {
-    bool retval = false;
-    if (newactivity != nullptr)
-    {
-        activities[current_number_activities++] = newactivity;
-        retval = true;
-    }
-    return retval;
+        for (uint8_t index = 0; index < number_activities_; index++) {
+                delete activities_[index];
+                activities_[index] = nullptr;
+        }
+        number_activities_ = 0;
 }
 
-
-bool ActivityManager::AddDigitalPulse(int32_t pin, int32_t start_delay_ms, int32_t duration, int32_t period, int32_t secondary, int32_t analog_value)
-{
-    bool retval = false;
-
-    if (current_number_activities < MAX_ACTIVITIES)
-    {
-        auto newactivity = new DigitalPulse(pin, start_delay_ms, duration, period, secondary, analog_value);
-        retval = AddActivity(newactivity);
-    }
-    return retval;
-}
-
-bool ActivityManager::AddprimaryDigitalPulse(int32_t pin, int32_t start_delay_ms, int32_t duration, int32_t period, int32_t secondary, int32_t analog_value)
-{
-    bool retval = false;
-    int8_t current_number_secondarys = 0;
-    if (current_number_activities < MAX_ACTIVITIES)
-    {
-        auto newactivity = new primaryDigitalPulse(pin, start_delay_ms, duration, period, secondary, analog_value);
-        retval = AddActivity(newactivity);
-        for (int i = 0; i < current_number_activities;  i++)
-        {
-            if(activities[i]->is_secondary()>0)
-            {
-                newactivity->Addsecondary(activities[i]);
-            }
-        }        
-    }
-    return retval;
-}
-
-bool ActivityManager::AddAnalogueMeasure(int32_t pin, int32_t start_delay_ms, int32_t duration, int32_t period, int32_t secondary)
+bool ActivityManager::addActivity(IActivity *newactivity)
 {
         bool retval = false;
-        if (current_number_activities < MAX_ACTIVITIES)
-        {
-            auto newactivity = new AnalogMeasure(pin, start_delay_ms, duration, period, secondary);
-            retval = AddActivity(newactivity);
+        if (newactivity != nullptr
+            && number_activities_ < kMaxActivities){
+                activities_[number_activities_++] = newactivity;
+                retval = true;
         }
         return retval;
 }
 
-PeriodicActivity **ActivityManager::Activities()
+IActivity **ActivityManager::getActivities()
 {
-    return activities;
+        return activities_;
 }
 
-uint8_t ActivityManager::NumberActivities()
+uint8_t ActivityManager::countActivities()
 {
-    return current_number_activities;
+        return number_activities_;
 }
 
-void ActivityManager::enable(bool enabled)
+uint8_t ActivityManager::availableSpace()
 {
-    for (uint8_t index = 0; index < current_number_activities; index++)
-    {
-        if (enabled)
-            activities[index]->enable();
-        else
-            activities[index]->disable();
-    }
+        return kMaxActivities - number_activities_;
+}
+
+IActivity *ActivityManager::getActivityOnPin(uint8_t pin)
+{
+        IActivity *activity = nullptr;
+        for (uint8_t index = 0; index < number_activities_; index++) {
+                if (activities_[index]->getPin() == pin) {
+                        activity = activities_[index];
+                        break;
+                }
+        }
+        return activity;
 }

@@ -29,12 +29,8 @@ from CSLserial import ControlSerial
     
 class ControlLight():
     def __init__(self, arduino_port):
-        
         self.arduino_port = arduino_port
-
         self.arduino = ControlSerial(self.arduino_port)
-
-
 
 
     def add_digital_pulse(self, dic_param):
@@ -44,49 +40,62 @@ class ControlLight():
         offset = dic_param['offset']
         period = dic_param['period']
         duration = dic_param['duration']
-        secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
+        #secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
         analog_value = dic_param['analog_value']
 
-        offset_s = offset//1000
-        offset_ms = offset%1000
-        period_s = period//1000
-        period_ms = period%1000
-        duration_s = duration//1000
-        duration_ms = duration%1000
-        self.arduino.send_command("d[%d,%d,%d,%d,%d,%d,%d,%d,%d]" % (pin, offset_s, offset_ms, period_s,period_ms, duration_s,
-                                                        duration_ms, secondary, analog_value))
+        offset_s = int(offset // 1000)
+        offset_ms = int(offset % 1000)
+        period_s = int(period // 1000)
+        period_ms = int(period % 1000)
+        duration_s = int(duration // 1000)
+        duration_ms = int(duration % 1000)
+        
+        self.arduino.send_command("d[%d,%d,%d,%d,%d,%d,%d,%d]"
+                                  % (pin, offset_s, offset_ms,
+                                     duration_s, duration_ms,
+                                     period_s, period_ms,
+                                     analog_value))
 
-    def add_primary_digital_pulse(self, dic_param): 
-        """create a primary digital pulse function. When the primary is set to UP, all the secondary pulses are set to DOWN"""
-
-        pin = dic_param['pin'] 
-        offset = dic_param['offset']
-        period = dic_param['period']
-        duration = dic_param['duration']
-        secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
-        analog_value = dic_param['analog_value']
-    
-        offset_s = offset//1000
-        offset_ms = offset%1000
-        period_s = period//1000
-        period_ms = period%1000
-        duration_s = duration//1000
-        duration_ms = duration%1000
-        self.arduino.send_command("m[%d,%d,%d,%d,%d,%d,%d,%d,%d]" % (pin, offset_s, offset_ms, period_s,period_ms, duration_s,
-                                                        duration_ms, secondary, analog_value))
+    def set_secondary(self, primary, secondary): 
+        """Set a pulse as a secondary to another pulse. """
+        primary_pin = primary['pin'] 
+        secondary_pin = secondary['pin'] 
+        self.arduino.send_command(f"s[{primary_pin},{secondary_pin}]")
 
 
-    def start_measurement(self):
+    def start_measurement(self, duration=0):
         """start the experiment"""
-        self.arduino.send_command("b")
+        sec = duration // 1000
+        ms = duration % 1000
+        self.arduino.send_command(f"b[{sec},{ms}]")
 
+        
     def stop_measurement(self):
         """stop the experiment"""
         self.arduino.send_command("e")
-        self.arduino.reset_arduino()
+        #self.arduino.reset_arduino()
 
+        
+    def is_active(self):
+        """stop the experiment"""
+        result = self.arduino.send_command("A")
+        if result[1] == 0:
+            return False
+        else:
+            return True
 
+        
+    def wait(self):
+        """wait until the experiment is over"""
+        active = True
+        while active:
+            active = self.is_active()
+            time.sleep(0.5)
 
+        
+    def reset(self):
+        """Stop the measurements and erase the current set-up"""
+        self.arduino.send_command("R")
 
 
 if __name__ == "__main__":
@@ -123,10 +132,6 @@ if __name__ == "__main__":
 
                  
     LEDs.add_digital_pulse(blue_param)
-    LEDs.add_primary_digital_pulse(purple_param)
-
-    LEDs.start_measurement()
-
-    time.sleep(30)
-
-    LEDs.stop_measurement()
+    LEDs.add_digital_pulse(purple_param)
+    LEDs.set_secondary(purple_param, blue_param)
+    LEDs.start_measurement(30*s)

@@ -1,43 +1,116 @@
-/*
-  
-  Copyright (C) 2022 Sony Computer Science Laboratories
-  
-  Author(s) Peter Hanappe, Douglas Boari, Aliénor Lahlou
-  
-  free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see
-  <http://www.gnu.org/licenses/>.
-  
- */
+#if defined(ARDUINO_AVR_UNO)
 
-#include "Arduino.h"
-#include "clock.h"
-#include "PeriodicActivity.h"
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "UnoTimer.h"
 
 #define PRESCALING         1
 #define FREQUENCY_STEPPER  25000
 #define INTERRUPTS_PER_MILLISECOND 25
 
-volatile uint8_t current_interrupt;
-volatile int32_t current_time_ms;
+volatile uint8_t current_interrupt_ = 0;
+volatile int32_t current_time_ms_ = 0;
+IActivity **activities_ = 0;
+int num_activities_ = 0;
+volatile bool running_ = false;
 
-PeriodicActivity **activities = 0;
-int num_activities = 0;
+static void clock_init();
 
-void clock_register_activities(PeriodicActivity **a, int n)
+static void start_activities();
+static void stop_activities();
+static inline void update_activities(int32_t ms);
+
+        
+UnoTimer::UnoTimer()
 {
-        activities = a;
-        num_activities = n;
+}
+
+void UnoTimer::init()
+{
+        cli();
+        clock_init();
+        sei(); 
+}
+
+static void start_timer()
+{
+        /* Initialize counter */
+        TCNT1 = 0;              
+        /* Enable Timer1 */     
+        TIMSK1 |= (1 << OCIE1A);
+}
+
+static void stop_timer()
+{
+        /* Disable Timer1 interrupt */
+        TIMSK1 &= ~(1 << OCIE1A);
+}
+
+void UnoTimer::start(IActivity **a, int n)
+{
+        stop();
+        activities_ = a;
+        num_activities_ = n;
+        start_activities();
+        current_interrupt_ = INTERRUPTS_PER_MILLISECOND - 1;
+        current_time_ms_ = 0;
+        running_ = true;
+        start_timer();
+}
+
+void UnoTimer::stop()
+{
+        running_ = false;
+        stop_timer();
+        stop_activities();
+        num_activities_ = 0;
+        activities_ = nullptr;
+}
+
+bool UnoTimer::isActive()
+{
+        return running_;
+}
+
+// FIXME
+static void start_activities()
+{
+        for (int i = 0; i < num_activities_; i++) {
+                activities_[i]->start();
+        }
+}
+
+// FIXME
+static void stop_activities()
+{
+        for (int i = 0; i < num_activities_; i++) {
+                activities_[i]->stop();
+        }
+}
+
+// FIXME
+static inline void update_activities(int32_t ms)
+{
+        for (int i = 0; i < num_activities_; i++) {
+                if (!activities_[i]->isSecondary())
+                        activities_[i]->update(ms);
+        }
+        for (int i = 0; i < num_activities_; i++) {
+                if (activities_[i]->isSecondary())
+                        activities_[i]->update(ms);
+        }
+}
+
+static inline void call_activities()
+{
+        current_interrupt_++;
+        if (current_interrupt_ == INTERRUPTS_PER_MILLISECOND) {
+                current_interrupt_ = 0;
+                if (running_) {
+                        update_activities(current_time_ms_);
+                }
+                current_time_ms_++;
+        }
 }
 
 /*
@@ -45,17 +118,17 @@ void clock_register_activities(PeriodicActivity **a, int n)
   https://fr.wikiversity.org/wiki/Micro_contr%C3%B4leurs_AVR/Le_Timer_1
   http://maxembedded.com/2011/07/avr-timers-ctc-mode/
   
-
+*/
 /**
  * \brief: Configure Timer1 to drive the stepper's STEP pulse train.
  *
  *  Timer1 is used as the "stepper timer", i.e. this timer will pulse
  *  the STEP pins of the stepper drivers.
  */
-void clock_init()
+static void clock_init()
 {
-        current_interrupt = 0;
-        current_time_ms = 0;
+        current_interrupt_ = 0;
+        current_time_ms_ = 0;
 
         /* Don't enable the timer, yet */
         TIMSK1 &= ~(1 << OCIE1A);
@@ -137,20 +210,7 @@ void clock_init()
  */
 ISR(TIMER1_COMPA_vect)
 {
-        current_interrupt++;
-        if (current_interrupt == INTERRUPTS_PER_MILLISECOND) {
-                current_interrupt = 0;
-                current_time_ms++;
-
-                for (int i = 0; i < num_activities; i++)
-                   {
-                        if (activities[i]->is_enabled()) {
-                                activities[i]->update(current_time_ms);
-                        }
-                        else
-                        {
-                            activities[i]->off();
-                        }
-                   }
-        }
+        call_activities();
 }
+
+#endif // if UNO
