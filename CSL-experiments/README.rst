@@ -131,8 +131,9 @@ Example of adaptation of [CSL-camera](XXX)
 |    update_param = {"Exposure": 150*1000,                            |    @ex.config                                                |
 |                  "Gain": 23}                                        |    def config():                                             |
 |    downscale = 5 #downscale the image to save                       |       cam_type = "MMConfig/Daheng.json"                      |
-|    cam = ControlCamera(cam_type, update_param, downscale)N_im =  20 |       update_param = {"Exposure": 150*1000,                  |
-|    cam.snap_video(N_im)                                             |                  "Gain": 23}                                 |
+|    cam = ControlCamera(cam_type, update_param, downscale)           |       update_param = {"Exposure": 150*1000,                  |
+|    N_im =  20                                                       |                  "Gain": 23}                                 |
+|    cam.snap_video(N_im)                                             |                                                              |
 |    video, timing = save_video("save_folder")                        |       downscale = 5 #downscale the image to save             |
 |                                                                     |       N_im =  20                                             |
 |                                                                     |    @ex.capture                                               |
