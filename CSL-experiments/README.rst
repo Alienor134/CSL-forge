@@ -122,7 +122,7 @@ Example of adaptation of [CSL-camera](XXX)
 -------
 
 +---------------------------------------------------------------------+--------------------------------------------------------------+
-| **Script to control a motor**                                       | **The same script as Sacred experiment**                     |
+| **Script to control a camera**                                      | **The same script as Sacred experiment**                     |
 +=====================================================================+==============================================================+
 | .. code:: python                                                    | .. code:: python                                             |
 |                                                                     |                                                              |
@@ -135,7 +135,7 @@ Example of adaptation of [CSL-camera](XXX)
 |    N_im =  20                                                       |                  "Gain": 23}                                 |
 |    cam.snap_video(N_im)                                             |                                                              |
 |    video, timing = save_video("save_folder")                        |       downscale = 5 #downscale the image to save             |
-|                                                                     |       N_im =  20                                             |
+|    cam.reset()                                                      |       N_im =  20                                             |
 |                                                                     |    @ex.capture                                               |
 |                                                                     |    def get_camera():                                         |
 |                                                                     |       cam = ControlCamera(cam_type, update_param, downscale) |
