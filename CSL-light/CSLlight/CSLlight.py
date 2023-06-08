@@ -26,22 +26,21 @@ import argparse
 
 from CSLserial import ControlSerial
 
-    
 class ControlLight():
     def __init__(self, arduino_port):
         self.arduino_port = arduino_port
         self.arduino = ControlSerial(self.arduino_port)
 
 
-    def add_digital_pulse(self, dic_param):
+    def add_digital_pulse(self, params):
         """create a digital pulse function. See next function to understand the "secondary" parameter"""
 
-        pin = dic_param['pin'] 
-        offset = dic_param['offset']
-        period = dic_param['period']
-        duration = dic_param['duration']
-        #secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
-        analog_value = dic_param['analog_value']
+        pin = params['pin'] 
+        offset = params['offset']
+        period = params['period']
+        duration = params['duration']
+        #secondary = params['secondary'] #secondary=0: indépendant, secondary=1: dependant
+        analog_value = params['analog_value']
 
         offset_s = int(offset // 1000)
         offset_ms = int(offset % 1000)
