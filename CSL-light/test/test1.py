@@ -1,13 +1,9 @@
-from serial import Serial
 from CSLlight import ControlLight
-import time
 
 #arduino_port = "COM5"
 arduino_port = "/dev/ttyACM0"
 
-ms = 1
 sec = 1000
-min = 60*sec
 
 blue_param = {'pin': 6,
               'offset': 0,
