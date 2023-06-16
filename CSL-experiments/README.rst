@@ -101,7 +101,7 @@ Example of adaptation of [CSL-motors](XXX)
 |   stage.handle_enable(1)                   |                                                        |
 |   stage.move_dx(10)                        |   @ex.config:                                          |
 |   stage.handle_enable(0)                   |   def cfg():                                           |
-|   stage.link.close()                       |     arduino_port = "COM5"                              |
+|   stage.reset()                            |     arduino_port = "COM5"                              |
 |                                            |     gears = [1,1,1]                                    |
 |                                            |                                                        |
 |                                            |   @ex.capture                                          |
@@ -114,7 +114,7 @@ Example of adaptation of [CSL-motors](XXX)
 |                                            |                                                        |
 |                                            |     stage.handle_enable(1)    stage.move_dx(10)        |
 |                                            |     stage.handle_enable(0)                             |
-|                                            |     stage.link.close()                                 |
+|                                            |     stage.reset()                                      |
 |                                            |                                                        |
 +--------------------------------------------+--------------------------------------------------------+
 
