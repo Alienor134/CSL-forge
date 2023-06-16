@@ -112,7 +112,8 @@ Example of adaptation of [CSL-motors](XXX)
 |                                            |   def run():                                           |
 |                                            |     stage = get_stage()                                |
 |                                            |                                                        |
-|                                            |     stage.handle_enable(1)    stage.move_dx(10)        |
+|                                            |     stage.handle_enable(1)                             |
+|                                            |     stage.move_dx(10)                                  |
 |                                            |     stage.handle_enable(0)                             |
 |                                            |     stage.reset()                                      |
 |                                            |                                                        |
