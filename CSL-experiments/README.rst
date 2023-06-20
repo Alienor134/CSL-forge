@@ -95,26 +95,27 @@ Example of adaptation of [CSL-motors](XXX)
 |   from CSLstage.CSLstage import CSLstage   |   from serial import Serial                            |
 |                                            |   import CSLlight                                      |
 |   arduino_port = "COM6"                    |   from sacred.observers import MongoObserver           |
-|                                            |   from sacred import Experiment                        |
-|   stage = CSLstage(arduino_port, [1,1,1])  |   ex = Experiment('blink_LED')                         |
+|   gears = [1,1,1]                          |   from sacred import Experiment                        |
+|   stage = CSLstage(arduino_port, gears)    |   ex = Experiment('blink_LED')                         |
 |   #gearbox ratio of X, Y and Z axis        |   ex.observers.append(MongoObserver(db_name = "demo")) |
 |   stage.handle_enable(1)                   |                                                        |
 |   stage.move_dx(10)                        |   @ex.config:                                          |
 |   stage.handle_enable(0)                   |   def cfg():                                           |
-|   stage.link.close()                       |     arduino_port = "COM5"                              |
+|   stage.reset()                            |     arduino_port = "COM5"                              |
 |                                            |     gears = [1,1,1]                                    |
 |                                            |                                                        |
 |                                            |   @ex.capture                                          |
 |                                            |   def get_stage():                                     |
-|                                            |     stage = CSLstage(arduino_port, [1,1,1])            |
+|                                            |     stage = CSLstage(arduino_port, gears)              |
 |                                            |                                                        |
 |                                            |   @ex.automain                                         |
 |                                            |   def run():                                           |
 |                                            |     stage = get_stage()                                |
 |                                            |                                                        |
-|                                            |     stage.handle_enable(1)    stage.move_dx(10)        |
+|                                            |     stage.handle_enable(1)                             |
+|                                            |     stage.move_dx(10)                                  |
 |                                            |     stage.handle_enable(0)                             |
-|                                            |     stage.link.close()                                 |
+|                                            |     stage.reset()                                      |
 |                                            |                                                        |
 +--------------------------------------------+--------------------------------------------------------+
 
@@ -122,7 +123,7 @@ Example of adaptation of [CSL-camera](XXX)
 -------
 
 +---------------------------------------------------------------------+--------------------------------------------------------------+
-| **Script to control a motor**                                       | **The same script as Sacred experiment**                     |
+| **Script to control a camera**                                      | **The same script as Sacred experiment**                     |
 +=====================================================================+==============================================================+
 | .. code:: python                                                    | .. code:: python                                             |
 |                                                                     |                                                              |
@@ -131,10 +132,11 @@ Example of adaptation of [CSL-camera](XXX)
 |    update_param = {"Exposure": 150*1000,                            |    @ex.config                                                |
 |                  "Gain": 23}                                        |    def config():                                             |
 |    downscale = 5 #downscale the image to save                       |       cam_type = "MMConfig/Daheng.json"                      |
-|    cam = ControlCamera(cam_type, update_param, downscale)N_im =  20 |       update_param = {"Exposure": 150*1000,                  |
-|    cam.snap_video(N_im)                                             |                  "Gain": 23}                                 |
+|    cam = ControlCamera(cam_type, update_param, downscale)           |       update_param = {"Exposure": 150*1000,                  |
+|    N_im =  20                                                       |                  "Gain": 23}                                 |
+|    cam.snap_video(N_im)                                             |                                                              |
 |    video, timing = save_video("save_folder")                        |       downscale = 5 #downscale the image to save             |
-|                                                                     |       N_im =  20                                             |
+|    cam.reset()                                                      |       N_im =  20                                             |
 |                                                                     |    @ex.capture                                               |
 |                                                                     |    def get_camera():                                         |
 |                                                                     |       cam = ControlCamera(cam_type, update_param, downscale) |
