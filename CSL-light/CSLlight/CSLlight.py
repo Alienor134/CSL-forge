@@ -113,10 +113,13 @@ if __name__ == "__main__":
     LEDs.arduino.set_debug(True)
     time.sleep(2.0)
 
+    sec = 1000
+    min = 60*sec
+
     blue_param = {'pin': 3,
             'offset': 500, #ms
-            'period': 5*1000, #ms
-            'duration': 2*1000, #ms
+            'period': 5*sec, #ms
+            'duration': 2*sec, #ms
             'secondary': 1,
             'analog_value': 255,
             }
@@ -124,8 +127,8 @@ if __name__ == "__main__":
     # purple
     purple_param = {'pin': 11,
                 'offset': 0,
-                'period': 5*1000,
-                'duration': 2*1000,
+                'period': 5*sec,
+                'duration': 2*sec,
                 'secondary': 0,
                 'analog_value': 255,
                  }
@@ -134,4 +137,4 @@ if __name__ == "__main__":
     LEDs.add_digital_pulse(blue_param)
     LEDs.add_digital_pulse(purple_param)
     LEDs.set_secondary(purple_param, blue_param)
-    LEDs.start_measurement(30*s)
+    LEDs.start_measurement(30*sec)

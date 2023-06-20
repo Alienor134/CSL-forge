@@ -36,6 +36,8 @@ import copy
 import pandas as pd
 import tifffile
 import os
+from colorlog import logger
+
 
 csl_path = os.environ['CSL_PATH']
 
@@ -78,7 +80,7 @@ class ControlCamera(threading.Thread):
         f = open(config_file)
         config = json.load(f)
       except FileNotFoundError:
-          print(f"Config file '{config_file}' not found.")
+          logger.error(f"Config file '{config_file}' not found.")
           raise
       
       self.name = config["name"]
@@ -94,7 +96,7 @@ class ControlCamera(threading.Thread):
       try:
         self.mmc.loadSystemConfiguration(csl_path + "/" + config["MMconfig"])
       except:
-         print("Error accessing the camera with pymmcore-plus (interface with MicroManager). Consider checking that the camera driver is installed and that the .dll is known by MicroManager")
+         logger.error("Error accessing the camera with pymmcore-plus (interface with MicroManager). Consider checking that the camera driver is installed, that the .dll is known by MicroManager and that the camera is properly connected.")
 
 
       
@@ -120,7 +122,7 @@ class ControlCamera(threading.Thread):
         try:
             self.mmc.setProperty(self.name, key, val)
         except Exception as e:
-            print(f"Failed to update parameter '{key}' with value '{val}': {e}")
+            logger.error(f"Failed to update parameter '{key}' with value '{val}': {e}")
 
     def get_param(self, key):
         """
@@ -136,7 +138,7 @@ class ControlCamera(threading.Thread):
         try:
             return self.mmc.getProperty(self.name, key)
         except Exception as e:
-            print(f"Failed to retrieve parameter '{key}': {e}")
+            logger.error(f"Failed to retrieve parameter '{key}': {e}")
             return None
 
 
@@ -173,9 +175,9 @@ class ControlCamera(threading.Thread):
         try:
             self.mmc.snapImage()
             self.frame = self.mmc.getImage()
-            # image = np.array(Image.fromarray(np.uint8(frame)))
+            self.image = np.array(Image.fromarray(np.uint8(self.frame)))
         except Exception as e:
-            print(f"Failed to snap image: {e}")
+            logger.error(f"Failed to snap image: {e}")
 
     def snap_video(self, N_im): 
       """
@@ -267,12 +269,12 @@ if __name__== "__main__":
   """ init camera"""
 
   """ DAHENG """
-  cam_param = {"TriggerSource": "Software"}
-  cam = ControlCamera(csl_path + "/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
+ # cam_param = {"TriggerSource": "Software"}
+ # cam = ControlCamera(csl_path + "/CSL-forge/CSL-camera/MMconfig/Daheng.json", cam_param)
 
   """ UEYE """
-  #cam_param = {"Trigger": "internal"}
-  #cam = Camera(csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json", cam_param)
+  cam_param = {"Trigger": "internal"}
+  cam = ControlCamera(csl_path + "/CSL-forge/CSL-camera/MMConfig/UEye.json", cam_param)
 
   """ ANDOR """
   #cam_param = {}
@@ -281,25 +283,26 @@ if __name__== "__main__":
   """ Acquisition """
 
   """ Continuous stream """
-  #cam.continuous_stream()
+  if False:
+    cam.continuous_stream()
 
 
   """ Single image """
   
   if False:
-    im = cam.snap_image()
-    plt.imshow(im)
-    plt.show()
+    cam.snap_image()
+    cv2.imshow('image',  cv2.normalize(clip(cam.image), None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1))
     time.sleep(10)
 
   """ Video acquisition """
 
-  #exp_duration = 5 #s
-  #N_im = exp_duration * float(cam.get_param("AcquisitionFrameRate"))
-  N_im =  20
+  if True:
+    #exp_duration = 5 #s
+    #N_im = exp_duration * float(cam.get_param("AcquisitionFrameRate"))
+    N_im =  20
 
-  cam.snap_video(N_im)
-  print(len(cam.video))
+    cam.snap_video(N_im)
+    print(len(cam.video))
 
 
 

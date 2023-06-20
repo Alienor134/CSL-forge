@@ -44,14 +44,14 @@ min = 60*1000
 @arduino_LED.config
 def update_cfg(blue_param, purple_param, trigger_param):
 
-    blue_param["offset"] = 0*250*sec + 20*sec
+    blue_param["offset"] = 1*250*sec + 20*sec
     blue_param["period"] = 30*min
     blue_param["duration"] = 15*min
     blue_param["analog_value"] = 255//5
     blue_param["secondary"] = 1
     
 
-    purple_param["offset"] = 0*250*sec + 10*sec
+    purple_param["offset"] = 1*250*sec + 10*sec
     purple_param["period"] = 20*sec
     purple_param["duration"] = 200 #ms
     purple_param["analog_value"] = 190
@@ -103,7 +103,7 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     save_folder =  make_folder(_run)
     ### initialize devices
     ##ARDUINO
-    arduino_light = get_arduino_light(arduino_LED['port_arduino'])
+    arduino_light = get_arduino_light(arduino_LED['arduino_port'])
 
     cam = ControlCamera(cam_type, cam_param, downscale)
     #cam.camera_mode = "snap_video"
@@ -117,7 +117,11 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     arduino_light.add_digital_pulse(arduino_LED['blue_param'])
 
     #purple LED
-    arduino_light.add_primary_digital_pulse(arduino_LED['purple_param'])
+    arduino_light.add_digital_pulse(arduino_LED['purple_param'])
+
+    # when purple turns on, blue should turn off
+    arduino_light.set_secondary(arduino_LED['purple_param'], arduino_LED['blue_param'])
+
 
 
 
@@ -133,7 +137,7 @@ def run(_run, exp_duration, framerate, arduino_LED, cam_type, cam_param, downsca
     arduino_light.stop_measurement()
     #cam.join()
 
-    result, timing = cam.save_video(_run)
+    result, timing = cam.save_video(save_folder, _run)
 
     for i, frame in enumerate(result):
         _run.log_scalar("Fluorescence", np.mean(frame), i)
