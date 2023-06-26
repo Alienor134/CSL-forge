@@ -2,13 +2,15 @@ from setuptools import setup, find_packages
 
 
 install_requires = [
-    'matplotlib',
-    'numpy',
+    'colorlog-python',
     'pymmcore-plus',
     'opencv-python>=4.7.0',
+    'matplotlib',
     'scikit-image',
     'ipdb',
-    'pandas'
+    'pandas',
+    'numpy',
+    
 ]
 
 

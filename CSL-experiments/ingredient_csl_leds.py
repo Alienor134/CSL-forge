@@ -37,7 +37,7 @@ arduino_LED = Ingredient('arduino_LED')
 @arduino_LED.config
 def cfg():
 
-    port_arduino = "COM5"
+    arduino_port = "COM5"
 
     blue_param = {'pin': 3,
             'offset': 500, #ms
@@ -67,5 +67,5 @@ def cfg():
 
 
 @arduino_LED.capture
-def get_arduino_light(port_arduino):
-    return ControlLight(port_arduino)
+def get_arduino_light(arduino_port):
+    return ControlLight(arduino_port)

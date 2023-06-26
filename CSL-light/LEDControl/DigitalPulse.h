@@ -20,35 +20,32 @@
   
  */
 
+#ifndef __DigitalPulse_h
+#define __DigitalPulse_h
 
-//
-// Created by douglas on 12/02/2021.
-//
+#include "PeriodicActivity.h"
 
-#ifndef __ActivityManager_h
-#define __ActivityManager_h
-
-#include "IActivity.h"
-
-
-class ActivityManager
+class DigitalPulse : public PeriodicActivity
 {
-private:
-        static const uint8_t kMaxActivities = 10;
-        
-        IActivity *activities_[kMaxActivities];
-        uint8_t number_activities_;
-
 public:
-        explicit ActivityManager();
-        virtual ~ActivityManager();
+        int value_;
         
-        bool addActivity(IActivity *activity);
-        IActivity **getActivities();
-        uint8_t countActivities();
-        uint8_t availableSpace();
-        IActivity *getActivityOnPin(uint8_t pin);
-        void clear();
+        DigitalPulse(int8_t pin, int32_t start_offset, int32_t period,
+                     int32_t duration, int analog_value)
+                : PeriodicActivity(pin, start_offset, period, duration),
+                  value_(analog_value) {
+                pinMode(pin_, OUTPUT);                
+        }
+
+        void on() override {
+                analogWrite(pin_, value_);
+                on_ = true;
+        }
+        
+        void off() override {
+                analogWrite(pin_, 0);
+                on_ = false;
+        }
 };
 
-#endif //__ActivityManager_h
+#endif // __DigitalPulse_h

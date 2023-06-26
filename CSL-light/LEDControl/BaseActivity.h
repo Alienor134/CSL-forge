@@ -20,35 +20,45 @@
   
  */
 
-
-//
-// Created by douglas on 12/02/2021.
-//
-
-#ifndef __ActivityManager_h
-#define __ActivityManager_h
+#ifndef __BaseActivity_h
+#define __BaseActivity_h
 
 #include "IActivity.h"
 
-
-class ActivityManager
+class BaseActivity : public IActivity
 {
-private:
-        static const uint8_t kMaxActivities = 10;
-        
-        IActivity *activities_[kMaxActivities];
-        uint8_t number_activities_;
-
 public:
-        explicit ActivityManager();
-        virtual ~ActivityManager();
         
-        bool addActivity(IActivity *activity);
-        IActivity **getActivities();
-        uint8_t countActivities();
-        uint8_t availableSpace();
-        IActivity *getActivityOnPin(uint8_t pin);
-        void clear();
-};
+protected:
+        int8_t pin_;
+        bool on_;
+        IActivity *primary_;
+        
+public:
 
-#endif //__ActivityManager_h
+        BaseActivity(int8_t pin)
+                : pin_(pin),
+                  on_(false),
+                  primary_(nullptr) {
+        }
+        
+        ~BaseActivity() = default;
+
+        uint8_t getPin() override {
+                return pin_;
+        }
+
+        bool isOn() override {
+                return on_;
+        }
+
+        bool isSecondary() override {
+                return primary_ != nullptr;
+        }
+
+        void setPrimary(IActivity *activity) override {
+                primary_ = activity;
+        }
+};
+        
+#endif // __BaseActivity_h
