@@ -26,22 +26,21 @@ import argparse
 
 from CSLserial import ControlSerial
 
-    
 class ControlLight():
     def __init__(self, arduino_port):
         self.arduino_port = arduino_port
         self.arduino = ControlSerial(self.arduino_port)
 
 
-    def add_digital_pulse(self, dic_param):
+    def add_digital_pulse(self, params):
         """create a digital pulse function. See next function to understand the "secondary" parameter"""
 
-        pin = dic_param['pin'] 
-        offset = dic_param['offset']
-        period = dic_param['period']
-        duration = dic_param['duration']
-        #secondary = dic_param['secondary'] #secondary=0: indépendant, secondary=1: dependant
-        analog_value = dic_param['analog_value']
+        pin = params['pin'] 
+        offset = params['offset']
+        period = params['period']
+        duration = params['duration']
+        #secondary = params['secondary'] #secondary=0: indépendant, secondary=1: dependant
+        analog_value = params['analog_value']
 
         offset_s = int(offset // 1000)
         offset_ms = int(offset % 1000)
@@ -113,13 +112,10 @@ if __name__ == "__main__":
     LEDs.arduino.set_debug(True)
     time.sleep(2.0)
 
-    sec = 1000
-    min = 60*sec
-
     blue_param = {'pin': 3,
             'offset': 500, #ms
-            'period': 5*sec, #ms
-            'duration': 2*sec, #ms
+            'period': 5*1000, #ms
+            'duration': 2*1000, #ms
             'secondary': 1,
             'analog_value': 255,
             }
@@ -127,8 +123,8 @@ if __name__ == "__main__":
     # purple
     purple_param = {'pin': 11,
                 'offset': 0,
-                'period': 5*sec,
-                'duration': 2*sec,
+                'period': 5*1000,
+                'duration': 2*1000,
                 'secondary': 0,
                 'analog_value': 255,
                  }
@@ -137,4 +133,4 @@ if __name__ == "__main__":
     LEDs.add_digital_pulse(blue_param)
     LEDs.add_digital_pulse(purple_param)
     LEDs.set_secondary(purple_param, blue_param)
-    LEDs.start_measurement(30*sec)
+    LEDs.start_measurement(30*s)
