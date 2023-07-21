@@ -53,30 +53,29 @@ Example of adaptation of [CSL-lights](XXX)
 +===============================================+========================================================+
 | .. code:: python                              | .. code:: python                                       |
 |                                               |                                                        |
-|   from serial import Serial                   |   from serial import Serial                            |
-|   import CSLlight                             |   import CSLlight                                      |
+|   from CSLlight import ControlLight           |   from CSLlight import ControlLight                    |
 |   arduino_port = "COM5"                       |   from sacred.observers import MongoObserver           |
 |   sec = 1000 #conversion ms to s              |   from sacred import Experiment                        |
 |   LED_param = {'pin':11,                      |   ex = Experiment('blink_LED')                         |
-|   'offset':0.5*sec,                           |   ex.observers.append(MongoObserver(db_name = "demo")) |
-|   'period': 5*sec,                            |                                                        |
-|   'duration': 2*sec,                          |   @ex.config:                                          |
-|   'analog_value': 255,                        |   def cfg():                                           |
-|   }                                           |     arduino_port = "COM5"                              |
+|                'offset':0.5*sec,              |   ex.observers.append(MongoObserver(db_name = "demo")) |
+|                'period': 5*sec,               |                                                        |
+|                'duration': 2*sec,             |   @ex.config:                                          |
+|                'analog_value': 255            |   def cfg():                                           |
+|                }                              |     arduino_port = "COM5"                              |
 |                                               |     sec = 1000 #conversion ms to s                     |
-|   link = Serial(arduino_port)                 |     LED_param = {'pin':11,                             |
-|   CSLLight.add_digital_pulse(link, LED_param) |                  'offset':0.5*sec,                     |
-|   CSLlight.start_measurement(link)            |                  'period': 5*sec,                      |
-|   time.sleep(300)                             |                  'duration': 2*sec,                    |
-|   CSLlight.stop_measurement(link)             |                  'analog_value': 255,                  |
+|   LEDs = ControlLight(port_arduino)           |     LED_param = {'pin':11,                             |
+|   LEDs.add_digital_pulse(LED_param)           |                  'offset':0.5*sec,                     |
+|   LEDs.start_measurement(100*sec)             |                  'period': 5*sec,                      |
+|   LEDs.stop_measurement()                     |                  'duration': 2*sec,                    |
+|   LEDs.reset() #optional                      |                  'analog_value': 255,                  |
 |                                               |                  }                                     |
 |                                               |   @ex.capture                                          |
 |                                               |   def blink():                                         |
-|                                               |     link = Serial(arduino_port)                        |
-|                                               |     CSLLight.add_digital_pulse(link, LED_param)        |
-|                                               |     CSLlight.start_measurement(link)                   |
-|                                               |     time.sleep(300)                                    |
-|                                               |     CSLlight.stop_measurement(link)                    |
+|                                               |     LEDs = ControlLight(arduino_port)                  |
+|                                               |     LEDs.add_digital_pulse(LED_param)                  |
+|                                               |     LEDs.start_measurement(100*sec)                    |
+|                                               |     LEDs.stop_measurement()                            |
+|                                               |     LEDs.reset() #optional                             |
 |                                               |                                                        |
 |                                               |   @ex.automain                                         |
 |                                               |   def run():                                           |
@@ -87,37 +86,37 @@ Example of adaptation of [CSL-lights](XXX)
 Example of adaptation of [CSL-motors](XXX)
 -------
 
-+--------------------------------------------+--------------------------------------------------------+
-| **Script to control a motor**              | **The same script as Sacred experiment**               |
-+============================================+========================================================+
-| .. code:: python                           | .. code:: python                                       |
-|                                            |                                                        |
-|   from CSLstage.CSLstage import CSLstage   |   from serial import Serial                            |
-|                                            |   import CSLlight                                      |
-|   arduino_port = "COM6"                    |   from sacred.observers import MongoObserver           |
-|   gears = [1,1,1]                          |   from sacred import Experiment                        |
-|   stage = CSLstage(arduino_port, gears)    |   ex = Experiment('blink_LED')                         |
-|   #gearbox ratio of X, Y and Z axis        |   ex.observers.append(MongoObserver(db_name = "demo")) |
-|   stage.handle_enable(1)                   |                                                        |
-|   stage.move_dx(10)                        |   @ex.config:                                          |
-|   stage.handle_enable(0)                   |   def cfg():                                           |
-|   stage.reset()                            |     arduino_port = "COM5"                              |
-|                                            |     gears = [1,1,1]                                    |
-|                                            |                                                        |
-|                                            |   @ex.capture                                          |
-|                                            |   def get_stage():                                     |
-|                                            |     stage = CSLstage(arduino_port, gears)              |
-|                                            |                                                        |
-|                                            |   @ex.automain                                         |
-|                                            |   def run():                                           |
-|                                            |     stage = get_stage()                                |
-|                                            |                                                        |
-|                                            |     stage.handle_enable(1)                             |
-|                                            |     stage.move_dx(10)                                  |
-|                                            |     stage.handle_enable(0)                             |
-|                                            |     stage.reset()                                      |
-|                                            |                                                        |
-+--------------------------------------------+--------------------------------------------------------+
++------------------------------------------------+--------------------------------------------------------+
+| **Script to control a motor**                  | **The same script as Sacred experiment**               |
++================================================+========================================================+
+| .. code:: python                               | .. code:: python                                       |
+|                                                |                                                        |
+|   from CSLstage.CSLstage import ControlStage   |   from serial import Serial                            |
+|                                                |   import CSLlight                                      |
+|   arduino_port = "COM6"                        |   from sacred.observers import MongoObserver           |
+|   gears = [1,1,1]                              |   from sacred import Experiment                        |
+|   stage = CSLstage(arduino_port, gears)        |   ex = Experiment('blink_LED')                         |
+|   #gearbox ratio of X, Y and Z axis            |   ex.observers.append(MongoObserver(db_name = "demo")) |
+|   stage.handle_enable(1)                       |                                                        |
+|   stage.move_dx(10)                            |   @ex.config:                                          |
+|   stage.handle_enable(0)                       |   def cfg():                                           |
+|   stage.reset()  #optional                     |     arduino_port = "COM5"                              |
+|                                                |     gears = [1,1,1]                                    |
+|                                                |                                                        |
+|                                                |   @ex.capture                                          |
+|                                                |   def get_stage():                                     |
+|                                                |     stage = CSLstage(arduino_port, gears)              |
+|                                                |                                                        |
+|                                                |   @ex.automain                                         |
+|                                                |   def run():                                           |
+|                                                |     stage = get_stage()                                |
+|                                                |                                                        |
+|                                                |     stage.handle_enable(1)                             |
+|                                                |     stage.move_dx(10)                                  |
+|                                                |     stage.handle_enable(0)                             |
+|                                                |     stage.reset() #optional                            |
+|                                                |                                                        |
++------------------------------------------------+--------------------------------------------------------+
 
 Example of adaptation of [CSL-camera](XXX)
 -------
@@ -127,15 +126,19 @@ Example of adaptation of [CSL-camera](XXX)
 +=====================================================================+==============================================================+
 | .. code:: python                                                    | .. code:: python                                             |
 |                                                                     |                                                              |
+|                                                                     |    from sacred.observers import MongoObserver                |
+|                                                                     |    from sacred import Experiment                             |
+|                                                                     |    ex = Experiment('get_movie')                              |
+|                                                                     |    ex.observers.append(MongoObserver(db_name = "demo"))      |
 |    from CSLcamera import ControlCamera                              |    from CSLcamera import ControlCamera                       |
-|    cam_type = "MMConfig/Daheng.json"                                |                                                              |
-|    update_param = {"Exposure": 150*1000,                            |    @ex.config                                                |
+|    cam_type = "MMConfig/UEye.json"                                  |                                                              |
+|    update_param = {"Exposure": 997,                                 |    @ex.config                                                |
 |                  "Gain": 23}                                        |    def config():                                             |
-|    downscale = 5 #downscale the image to save                       |       cam_type = "MMConfig/Daheng.json"                      |
-|    cam = ControlCamera(cam_type, update_param, downscale)           |       update_param = {"Exposure": 150*1000,                  |
+|    downscale = 5 #downscale the image to save                       |       cam_type = "MMConfig/UEye.json"                        |
+|    cam = ControlCamera(cam_type, update_param, downscale)           |       update_param = {"Exposure": 997,                       |
 |    N_im =  20                                                       |                  "Gain": 23}                                 |
 |    cam.snap_video(N_im)                                             |                                                              |
-|    video, timing = save_video("save_folder")                        |       downscale = 5 #downscale the image to save             |
+|    video, timing = save_video(save_folder)                          |       downscale = 5 #downscale the image to save             |
 |    cam.reset()                                                      |       N_im =  20                                             |
 |                                                                     |    @ex.capture                                               |
 |                                                                     |    def get_camera():                                         |
@@ -145,4 +148,7 @@ Example of adaptation of [CSL-camera](XXX)
 |                                                                     |    def run(N_im):                                            |
 |                                                                     |       cam.snap_video(N_im)                                   |
 |                                                                     |       video, timing = save_video(save_folder, _run)          |
+|                                                                     |       #adding the _run parameter allows to save the          |
+|                                                                     |       #outputs in MongoDB.                                   |
+|                                                                     |                                                              |
 +---------------------------------------------------------------------+--------------------------------------------------------------+
