@@ -142,7 +142,9 @@ Example of adaptation of [CSL-camera](XXX)
 |    cam.reset()                                                      |       N_im =  20                                             |
 |                                                                     |    @ex.capture                                               |
 |                                                                     |    def get_camera():                                         |
-|                                                                     |       cam = ControlCamera(cam_type, update_param, downscale) |
+|                                                                     |       cam = ControlCamera(cam_type,                          |
+|                                                                     |                            update_param,                     |
+|                                                                     |                            downscale)                        |
 |                                                                     |                                                              |
 |                                                                     |    @ex.automain                                              |
 |                                                                     |    def run(N_im):                                            |
