@@ -1,5 +1,5 @@
 Experimental framework based on Sacred
-======
+======================================
 The principle of Sacred is to store the experiment data and metadata in a file  that can be stored in a database. Here we used the noSQL framework with MongoDB. There are numerous aspects to Sacred detailed in the `original publication <https://conference.scipy.org/proceedings/scipy2017/klaus_greff.html>`_ including: 
 
 #. Save code and imported code used to launch the experiment
@@ -13,10 +13,15 @@ The principle of Sacred is to store the experiment data and metadata in a file  
 Install Sacred: 
 =================
 
+
+
 All the information about Sacred are here: `visit Sacred <https://github.com/IDSIA/sacred>`_
 
-Install the database 
+
+
+Install database: 
 =================
+
 
 Download `MongoDB <https://www.mongodb.com/try/download/community>`_
 Create a new database called "sacred" (no caps).
@@ -36,18 +41,18 @@ To launch omniboard:
 
 To open the interface connect to : http://localhost:9000/sacred
 
-![](Images/2023-02-06-10-57-11.png)
+![im](Images/2023-02-06-10-57-11.png)
 
 
 Install the database quiery tool: 
-=================
+=================================
 
 All the information about Incense are here: `visit Incense <https://github.com/JarnoRFB/incense>`_)
 
 
 
 Example of adaptation of [CSL-lights](XXX)
--------
+--------------------------------------------
 +-----------------------------------------------+--------------------------------------------------------+
 | **Script to control a light source**          | **The same script as Sacred experiment**               |
 +===============================================+========================================================+
@@ -84,7 +89,7 @@ Example of adaptation of [CSL-lights](XXX)
 +-----------------------------------------------+--------------------------------------------------------+
 
 Example of adaptation of [CSL-motors](XXX)
--------
+----------------------------------------------
 
 +------------------------------------------------+--------------------------------------------------------+
 | **Script to control a motor**                  | **The same script as Sacred experiment**               |
@@ -119,7 +124,7 @@ Example of adaptation of [CSL-motors](XXX)
 +------------------------------------------------+--------------------------------------------------------+
 
 Example of adaptation of [CSL-camera](XXX)
--------
+-------------------------------------------
 
 +---------------------------------------------------------------------+--------------------------------------------------------------+
 | **Script to control a camera**                                      | **The same script as Sacred experiment**                     |
